@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Cliente</title>
+  <link rel="stylesheet" href="css/principal_style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-flex">
+      <img src="assets/img/logo.png" alt="Logo Timba Tumbao" class="logo-img">
+    </div>
+  </header>
+
+  <section class="formulario-registro">
+    <div class="container">
+      <h2>Registro de Cliente</h2>
+
+      <form id="form-registro">
+        <div>
+          <label>Nombre Completo</label>
+          <input type="text" required>
+        </div>
+        <div>
+          <label>Teléfono</label>
+          <input type="tel" required>
+        </div>
+        <div>
+          <label>Correo</label>
+          <input type="email" required>
+        </div>
+        <div>
+          <label>Dirección</label>
+          <input type="text" required>
+        </div>
+        <div>
+          <label>Clase Seleccionada</label>
+          <input type="text" id="clase-seleccionada" disabled>
+        </div>
+
+        <button type="submit" class="btn-primario">Enviar Registro</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Academia de Baile. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
