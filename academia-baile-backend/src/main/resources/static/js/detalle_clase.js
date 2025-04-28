@@ -14,13 +14,24 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
   
-    // Mostrar la información
+    // Mostrar nombre y descripción
     document.getElementById('nombre-clase').innerText = claseSeleccionada.nombre;
     document.getElementById('descripcion-clase').innerText = claseSeleccionada.descripcion;
   
-    // Opcional: podrías mostrar más detalles si en tu clases.js tienes niveles, horarios, etc.
+    // Mostrar niveles
+    const contenedorNiveles = document.getElementById('niveles-clase');
+    contenedorNiveles.innerHTML = '';
   
-    // Cambiar el enlace del botón de inscripción para que pase el id
-    document.getElementById('btn-inscribirse').href = `registro.html?id=${claseSeleccionada.id}`;
+    claseSeleccionada.niveles.forEach((nivel, index) => {
+      const nivelCard = document.createElement('div');
+      nivelCard.classList.add('card-clase');
+      nivelCard.innerHTML = `
+        <h3>${nivel.nombre}</h3>
+        <p><strong>Horario:</strong> ${nivel.horario}</p>
+        <p><strong>Precio:</strong> $${nivel.precio}</p>
+        <a href="registro.html?id=${claseSeleccionada.id}&nivel=${index}" class="btn-primario">Inscribirse</a>
+      `;
+      contenedorNiveles.appendChild(nivelCard);
+    });
   });
   
