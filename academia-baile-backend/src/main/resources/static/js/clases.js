@@ -13,6 +13,16 @@ const clases = [
       id: 3,
       nombre: "Hip Hop Urbano",
       descripcion: "Siente el ritmo y aprende coreografías urbanas actuales."
+    },
+    {
+        id:4,
+        nombre: "Marinera",
+        descripcion: "Siente el ritmo y aprende coreografías urbanas actuales."  
+    },
+    {
+        id:5,
+        nombre: "Tango",
+        descripcion: "Siente el ritmo y aprende coreografías urbanas actuales."  
     }
   ];
   

@@ -9,8 +9,8 @@
   body {
     font-family: 'Montserrat', sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #f9f9f9;
+    color: #1E2A38; /* Azul navy oscuro para textos */
+    background-color: #FFFFFF; /* Fondo blanco */
   }
   
   /* Contenedor general */
@@ -22,7 +22,7 @@
   
   /* Estilos del Header */
   .header {
-    background-color: #fff;
+    background-color: #FFFFFF;
     padding: 10px 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     position: sticky;
@@ -44,7 +44,7 @@
   .header nav a {
     text-decoration: none;
     color: #fff;
-    background-color: #e63946;
+    background-color: #00A8CC; /* Azul turquesa para botones */
     padding: 10px 20px;
     border-radius: 30px;
     font-weight: 600;
@@ -52,13 +52,13 @@
   }
   
   .header nav a:hover {
-    background-color: #d62839;
+    background-color: #007999; /* Turquesa más oscuro al pasar mouse */
   }
   
   /* Hero Principal */
   .hero {
     background: url('../assets/img/hero.jpg') center/cover no-repeat;
-    color: #fff;
+    color: #FFFFFF;
     text-align: center;
     padding: 150px 20px;
   }
@@ -75,8 +75,8 @@
   
   .btn-primario, .btn-secundario {
     display: inline-block;
-    background-color: #e63946;
-    color: #fff;
+    background-color: #00A8CC; /* Azul turquesa */
+    color: #FFFFFF;
     padding: 10px 25px;
     border-radius: 30px;
     text-decoration: none;
@@ -85,12 +85,12 @@
   }
   
   .btn-primario:hover, .btn-secundario:hover {
-    background-color: #d62839;
+    background-color: #007999; /* Hover más oscuro */
   }
   
   /* Sobre Nosotros */
   .sobre-nosotros {
-    background-color: #fff;
+    background-color: #FFFFFF;
     padding: 80px 20px;
     text-align: center;
   }
@@ -108,7 +108,7 @@
   
   /* Galería */
   .galeria {
-    background-color: #f1f1f1;
+    background-color: #F7F7F7; /* Gris muy clarito para secciones */
     padding: 80px 20px;
     text-align: center;
   }
@@ -134,7 +134,7 @@
   
   /* Clases */
   .clases {
-    background-color: #fff;
+    background-color: #FFFFFF;
     padding: 80px 20px;
     text-align: center;
   }
@@ -144,24 +144,15 @@
     margin-bottom: 40px;
   }
   
+  /* Tarjetas de clases */
   .grid-clases {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
   }
   
-  /* Footer */
-  .footer {
-    background-color: #222;
-    color: #fff;
-    padding: 20px 0;
-    text-align: center;
-    font-size: 14px;
-  }
-  
-  /* Estilo para las tarjetas de las clases */
-.card-clase {
-    background: #fff;
+  .card-clase {
+    background: #FFFFFF;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -172,18 +163,18 @@
   .card-clase h3 {
     margin-bottom: 10px;
     font-size: 22px;
-    color: #e63946;
+    color: #00A8CC; /* Azul turquesa en títulos de clases */
   }
   
   .card-clase p {
     margin-bottom: 20px;
     font-size: 16px;
-    color: #666;
+    color: #666666; /* Gris medio para descripciones */
   }
   
   .card-clase .btn-secundario {
-    background-color: #e63946;
-    color: #fff;
+    background-color: #00A8CC;
+    color: #FFFFFF;
     padding: 8px 20px;
     border-radius: 30px;
     text-decoration: none;
@@ -191,12 +182,21 @@
   }
   
   .card-clase .btn-secundario:hover {
-    background-color: #d62839;
+    background-color: #007999;
   }
   
   /* Animación al pasar el mouse */
   .card-clase:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #1E2A38; /* Azul navy oscuro para el pie de página */
+    color: #FFFFFF;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 14px;
   }
   
