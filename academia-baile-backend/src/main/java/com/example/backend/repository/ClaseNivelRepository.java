@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ClaseNivelRepository extends JpaRepository<ClaseNivel, Integer> {
-    List<ClaseNivel> findByClase_Id(Integer claseId);
+    List<ClaseNivel> findByClaseId(Integer claseId);
 }
 

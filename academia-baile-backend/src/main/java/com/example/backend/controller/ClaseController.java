@@ -2,10 +2,12 @@ package com.example.backend.controller;
 
 import com.example.backend.entidades.Clase;
 import com.example.backend.entidades.ClaseNivel;
+import com.example.backend.entidades.ClaseNivelDTO;
 import com.example.backend.service.ClaseService;
 import com.example.backend.service.ClaseNivelService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,10 +28,11 @@ public class ClaseController {
         return claseService.listarClases();
     }
 
-    @GetMapping("/api/clases/{id}/niveles")
-    public List<ClaseNivel> obtenerNivelesPorClase(@PathVariable Integer id) {
-    return claseNivelService.obtenerNivelesPorClase(id);
+    @GetMapping("/{id}/niveles")
+    public ResponseEntity<List<ClaseNivelDTO>> obtenerNivelesPorClase(@PathVariable Integer id) {
+    return ResponseEntity.ok(claseNivelService.obtenerNivelesPorClase(id));
 }
+
 
 }
 
