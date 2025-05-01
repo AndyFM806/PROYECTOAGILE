@@ -1,11 +1,11 @@
 package com.example.backend.controller;
 
 import com.example.backend.entidades.Cliente;
-import com.example.backend.entidades.Clase;
-import com.example.backend.repository.ClaseRepository;
+import com.example.backend.entidades.ClaseNivel;
 import com.example.backend.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.example.backend.repository.ClaseNivelRepository;
 
 import java.util.List;
 
@@ -18,20 +18,18 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @Autowired
-    private ClaseRepository claseRepository;
-
+    private ClaseNivelRepository claseNivelRepository;
     @PostMapping
-    public Cliente registrarCliente(@RequestBody Cliente cliente) {
-        Integer claseId = cliente.getClase().getId();
+public Cliente registrarCliente(@RequestBody Cliente cliente) {
+    Integer claseNivelId = cliente.getClaseNivel().getId();
 
-        Clase clase = claseRepository.findById(claseId)
-            .orElseThrow(() -> new RuntimeException("Clase no encontrada con ID: " + claseId));
+    ClaseNivel claseNivel = claseNivelRepository.findById(claseNivelId)
+    .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada con ID: " + claseNivelId));
 
-        cliente.setClase(clase);
+    cliente.setClaseNivel(claseNivel); // ✅ establecer la relación correctamente
 
-        return clienteService.guardarCliente(cliente);
-    }
-
+    return clienteService.guardarCliente(cliente);
+}
     @GetMapping
     public List<Cliente> listarClientes() {
         return clienteService.listarClientes();

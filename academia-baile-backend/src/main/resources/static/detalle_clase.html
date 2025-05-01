@@ -5,12 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalle de Clase</title>
   <link rel="stylesheet" href="../css/principal_style.css">
+  <style>
+    /* Centrado general para la sección de detalle */
+    .detalle-clase {
+      text-align: center;
+      padding: 60px 20px;
+      background-color: #f0f8ff; /* Fondo claro */
+      border-radius: 10px; /* Bordes redondeados */
+      margin: 20px auto;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+    }
+
+    /* Opcional: mejorar el espaciado entre niveles */
+    .niveles .nivel-item {
+      margin-bottom: 30px;
+    }
+  </style>
 </head>
 <body>
 
-  <header class="header">
+  <header>
     <div class="container header-flex">
-      <!-- Asegúrate que esta ruta sea correcta desde tu carpeta /static/html -->
       <img src="../assets/img/logo.png" alt="Logo Timba Tumbao" class="logo-img">
     </div>
   </header>
@@ -21,8 +36,8 @@
       <p id="descripcion-clase"></p>
 
       <div id="niveles-clase" class="niveles container">
-        Aquí se insertan los niveles dinámicamente
-    </div>
+        <!-- Aquí se insertan los niveles dinámicamente -->
+      </div>
     </div>
   </section>
 

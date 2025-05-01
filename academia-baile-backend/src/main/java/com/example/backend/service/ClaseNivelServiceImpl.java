@@ -33,7 +33,5 @@ public class ClaseNivelServiceImpl implements ClaseNivelService {
     )).collect(Collectors.toList());
     
     }
-
-
 }
 

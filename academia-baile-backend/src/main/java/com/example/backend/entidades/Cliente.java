@@ -14,25 +14,36 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "nombre_completo", nullable = false, length = 150)
-    private String nombreCompleto;
+    @ManyToOne
+    @JoinColumn(name = "clase_nivel_id")
+    private ClaseNivel claseNivel;
 
-    @Column(nullable = false, length = 15)
-    private String telefono;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "nombres")
+    private String nombres;
+
+    @Column(name = "apellidos")
+    private String apellidos;
+
+    @Column(name = "correo")
     private String correo;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "direccion")
     private String direccion;
 
-    @Column(nullable = false, length = 20)
-    private String nivel;
+    @Column(name = "dni", nullable = false, unique = true)
+    private String dni;
 
-    @Column(name = "estado_pago", nullable = false, length = 20)
-    private String estadoPago;
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "clase_id", nullable = false)
-    private Clase clase;
-}
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+    }
+

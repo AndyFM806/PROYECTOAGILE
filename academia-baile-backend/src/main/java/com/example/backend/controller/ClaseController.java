@@ -1,7 +1,6 @@
 package com.example.backend.controller;
 
 import com.example.backend.entidades.Clase;
-import com.example.backend.entidades.ClaseNivel;
 import com.example.backend.entidades.ClaseNivelDTO;
 import com.example.backend.service.ClaseService;
 import com.example.backend.service.ClaseNivelService;

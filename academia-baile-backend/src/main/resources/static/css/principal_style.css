@@ -1,202 +1,215 @@
-/* Reset básico */
+/* === RESET GENERAL === */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Fuente principal */
-  body {
-    font-family: 'Montserrat', sans-serif;
-    line-height: 1.6;
-    color: #1E2A38; /* Azul navy oscuro para textos */
-    background-color: #FFFFFF; /* Fondo blanco */
-  }
-  
-  /* Contenedor general */
-  .container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  /* Estilos del Header */
-  .header {
-    background-color: #FFFFFF;
-    padding: 10px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  
-  .header-flex {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .logo-img {
-    height: 60px;
-    width: auto;
-  }
-  
-  .header nav a {
-    text-decoration: none;
-    color: #fff;
-    background-color: #00A8CC; /* Azul turquesa para botones */
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-weight: 600;
-    transition: background 0.3s;
-  }
-  
-  .header nav a:hover {
-    background-color: #007999; /* Turquesa más oscuro al pasar mouse */
-  }
-  
-  /* Hero Principal */
-  .hero {
-    background: url('../assets/img/hero.jpg') center/cover no-repeat;
-    color: #FFFFFF;
-    text-align: center;
-    padding: 150px 20px;
-  }
-  
-  .hero h2 {
-    font-size: 48px;
-    margin-bottom: 20px;
-  }
-  
-  .hero p {
-    font-size: 20px;
-    margin-bottom: 30px;
-  }
-  
-  .btn-primario, .btn-secundario {
-    display: inline-block;
-    background-color: #00A8CC; /* Azul turquesa */
-    color: #FFFFFF;
-    padding: 10px 25px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.3s;
-  }
-  
-  .btn-primario:hover, .btn-secundario:hover {
-    background-color: #007999; /* Hover más oscuro */
-  }
-  
-  /* Sobre Nosotros */
-  .sobre-nosotros {
-    background-color: #FFFFFF;
-    padding: 80px 20px;
-    text-align: center;
-  }
-  
-  .sobre-nosotros h2 {
-    font-size: 36px;
-    margin-bottom: 20px;
-  }
-  
-  .sobre-nosotros p {
-    font-size: 18px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  /* Galería */
-  .galeria {
-    background-color: #F7F7F7; /* Gris muy clarito para secciones */
-    padding: 80px 20px;
-    text-align: center;
-  }
-  
-  .galeria h2 {
-    font-size: 36px;
-    margin-bottom: 40px;
-  }
-  
-  .grid-galeria {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-  }
-  
-  .grid-galeria img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  
-  /* Clases */
-  .clases {
-    background-color: #FFFFFF;
-    padding: 80px 20px;
-    text-align: center;
-  }
-  
-  .seccion-titulo {
-    font-size: 36px;
-    margin-bottom: 40px;
-  }
-  
-  /* Tarjetas de clases */
-  .grid-clases {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  
-  .card-clase {
-    background: #FFFFFF;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  
-  .card-clase h3 {
-    margin-bottom: 10px;
-    font-size: 22px;
-    color: #00A8CC; /* Azul turquesa en títulos de clases */
-  }
-  
-  .card-clase p {
-    margin-bottom: 20px;
-    font-size: 16px;
-    color: #666666; /* Gris medio para descripciones */
-  }
-  
-  .card-clase .btn-secundario {
-    background-color: #00A8CC;
-    color: #FFFFFF;
-    padding: 8px 20px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  
-  .card-clase .btn-secundario:hover {
-    background-color: #007999;
-  }
-  
-  /* Animación al pasar el mouse */
-  .card-clase:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-  }
-  
-  /* Footer */
-  .footer {
-    background-color: #1E2A38; /* Azul navy oscuro para el pie de página */
-    color: #FFFFFF;
-    padding: 20px 0;
-    text-align: center;
-    font-size: 14px;
-  }
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.6;
+  color: #1E2A38;
+  background-color: #FFFFFF;
+}
+
+/* === CONTENEDOR GENERAL === */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* === HEADER === */
+.header {
+  background-color: #FFFFFF;
+  padding: 10px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-img {
+  height: 60px;
+  width: auto;
+}
+
+.header nav a {
+  text-decoration: none;
+  color: #fff;
+  background-color: #00A8CC;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.header nav a:hover {
+  background-color: #007999;
+}
+
+/* === HERO === */
+.hero {
+  background: url('../assets/img/hero.jpg') center/cover no-repeat;
+  color: #FFFFFF;
+  text-align: center;
+  padding: 150px 20px;
+}
+
+.hero h2 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+/* === BOTONES === */
+.btn-primario, .btn-secundario {
+  display: inline-block;
+  background-color: #00A8CC;
+  color: #FFFFFF;
+  padding: 10px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.btn-primario:hover, .btn-secundario:hover {
+  background-color: #007999;
+}
+
+/* === SOBRE NOSOTROS === */
+.sobre-nosotros {
+  background-color: #FFFFFF;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.sobre-nosotros h2 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.sobre-nosotros p {
+  font-size: 18px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* === GALERÍA === */
+.galeria {
+  background-color: #F7F7F7;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.galeria h2 {
+  font-size: 36px;
+  margin-bottom: 40px;
+}
+
+.grid-galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.grid-galeria img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* === CLASES PRINCIPALES === */
+.clases {
+  background-color: #FFFFFF;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.seccion-titulo {
+  font-size: 36px;
+  margin-bottom: 40px;
+}
+
+.grid-clases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 30px;
+  justify-content: center;
+}
+
+/* === TARJETA DE CLASE (solo en grilla principal) === */
+.grid-clases .card-clase {
+  background-color: #FFFFFF;
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.grid-clases .card-clase h3 {
+  font-size: 24px;
+  color: #00A8CC;
+  margin-bottom: 12px;
+}
+
+.grid-clases .card-clase p {
+  font-size: 16px;
+  color: #666666;
+  margin-bottom: 20px;
+  text-align: center;
+  max-width: 90%;
+}
+
+.grid-clases .card-clase .btn-secundario {
+  background-color: #00A8CC;
+  color: #FFFFFF;
+  padding: 10px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.grid-clases .card-clase .btn-secundario:hover {
+  background-color: #007999;
+}
+
+.grid-clases .card-clase:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* === TARJETAS EN OTRAS SECCIONES (como detalle_clase) === */
+.card-clase:not(.grid-clases .card-clase) {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* === FOOTER === */
+.footer {
+  background-color: #1E2A38;
+  color: #FFFFFF;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 14px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}

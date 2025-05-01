@@ -3,7 +3,7 @@ if (localStorage.getItem("adminAutenticado") !== "true") {
     window.location.href = "login_admin.html";
   }
 
-  fetch("http://localhost:8080/api/clientes")
+  fetch("http://localhost:8081/api/clientes")
     .then(res => res.json())
     .then(clientes => {
       const contenedorSolicitudes = document.getElementById("solicitudes");
@@ -31,7 +31,7 @@ if (localStorage.getItem("adminAutenticado") !== "true") {
           const btn = document.createElement("button");
           btn.textContent = "Aceptar Pago";
           btn.onclick = () => {
-            fetch(`http://localhost:8080/api/clientes/${cliente.id}/aceptar`, {
+            fetch(`http://localhost:8081/api/clientes/${cliente.id}/aceptar`, {
               method: "PUT"
             }).then(() => location.reload());
           };

@@ -5,6 +5,7 @@ public class ClaseNivelDTO {
     private String dias;
     private String hora;
     private Double precio;
+    
 
     public ClaseNivelDTO(String nivel, String dias, String hora, Double precio) {
         this.nivel = nivel;
