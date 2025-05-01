@@ -26,9 +26,10 @@ public class ClaseController {
         return claseService.listarClases();
     }
 
-    @GetMapping("/{id}/niveles")
+    @GetMapping("/api/clases/{id}/niveles")
     public List<ClaseNivel> obtenerNivelesPorClase(@PathVariable Integer id) {
-        return claseNivelService.obtenerNivelesPorClase(id);
-    }
+    return claseNivelService.obtenerNivelesPorClase(id);
+}
+
 }
 

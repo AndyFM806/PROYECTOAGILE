@@ -7,3 +7,4 @@ import java.util.List;
 public interface ClaseNivelRepository extends JpaRepository<ClaseNivel, Integer> {
     List<ClaseNivel> findByClase_Id(Integer claseId);
 }
+

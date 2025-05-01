@@ -12,14 +12,17 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(response => response.json())
     .then(clases => {
       const claseSeleccionada = clases.find(clase => clase.id === parseInt(claseId));
-      if (!claseSeleccionada) return;
+      if (!claseSeleccionada) {
+        console.error("Clase no encontrada");
+        return;
+      }
 
       document.getElementById('nombre-clase').innerText = claseSeleccionada.nombre;
       document.getElementById('descripcion-clase').innerText = claseSeleccionada.descripcion;
     })
     .catch(error => console.error("Error cargando la clase:", error));
 
-  // Obtener niveles desde clase_nivel
+  // Obtener niveles desde clase_nivel (ya relacionado con horario y nivel)
   fetch(`http://localhost:8080/api/clases/${claseId}/niveles`)
     .then(response => response.json())
     .then(niveles => {
@@ -31,10 +34,10 @@ document.addEventListener('DOMContentLoaded', function () {
         card.classList.add('card-clase');
 
         card.innerHTML = `
-          <h3>${nivel.nivel}</h3>
-          <p><strong>Horario:</strong> ${nivel.horario}</p>
+          <h3>${nivel.nivel.nombre}</h3>
+          <p><strong>Horario:</strong> ${nivel.horario.dias} - ${nivel.horario.hora}</p>
           <p><strong>Precio:</strong> S/${nivel.precio}</p>
-          <a href="registro.html?id=${claseId}&nivel=${nivel.nivel}&precio=${nivel.precio}" class="btn-primario">Inscribirme</a>
+          <a href="registro.html?id=${claseId}&nivel=${nivel.nivel.nombre}&precio=${nivel.precio}" class="btn-primario">Inscribirme</a>
         `;
         contenedor.appendChild(card);
       });

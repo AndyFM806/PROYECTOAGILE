@@ -25,8 +25,10 @@ public class ClaseNivel {
     @JoinColumn(name = "horario_id")
     private Horario horario;
 
+
     private Double precio;
 }
+
 
 
 

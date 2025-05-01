@@ -10,8 +10,11 @@ import lombok.Setter;
 public class Nivel {
 
     @Id
+    @Column(name = "id_nivel")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String nombre; // Básico, Intermedio, Avanzado
+    private String nombre;
 }
+
+
