@@ -1,23 +1,19 @@
-# Usa JDK 17 base
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jdk
 
-# Crea directorio de trabajo
 WORKDIR /app
 
-# Copia el pom y descarga dependencias primero (cacheo útil)
-COPY pom.xml ./
+# Copia el contenido necesario
 COPY .mvn .mvn
 COPY mvnw .
-RUN ./mvnw dependency:go-offline
+COPY pom.xml .
+COPY src src
 
-# Copia todo el código
-COPY . .
+# Da permisos y compila
+RUN chmod +x mvnw
+RUN ./mvnw clean install -DskipTests
 
-# Compila la app
-RUN ./mvnw clean package -DskipTests
-
-# Expone el puerto 8080
+# Expone el puerto del backend
 EXPOSE 8080
 
-# Ejecuta la app
+# Ejecuta el .jar final
 CMD ["java", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
