@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error("Error cargando la clase:", error));
 
   // Obtener niveles desde clase_nivel (DTO plano)
-  fetch(`proyectoagile-production.up.railway.app/api/clases/${claseId}/niveles`)
+  fetch(`academia-baile-front/static/api/clases/${claseId}/niveles`)
     .then(response => response.json())
     .then(niveles => {
       const contenedor = document.getElementById('niveles-clase');
