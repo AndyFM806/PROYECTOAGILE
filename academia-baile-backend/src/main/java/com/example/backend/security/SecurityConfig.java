@@ -2,7 +2,6 @@ package com.example.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,14 +15,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
+            .cors().and()
+            .csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/clases", "/api/clases/**", "/api/inscripciones/**").permitAll()
+                .requestMatchers(
+                    "/api/clases",
+                    "/api/clases/**",
+                    "/api/inscripciones",
+                    "/api/inscripciones/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults());
-
+            .httpBasic(); // puedes cambiar por .formLogin() si quieres usar login con formulario
         return http.build();
     }
 
@@ -33,8 +36,11 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                .allowedOrigins("https://marvelous-snickerdoodle-04c3ef.netlify.app", "http://127.0.0.1:5500")
-
+                        .allowedOrigins(
+                            "https://marvelous-snickerdoodle-04c3ef.netlify.app",
+                            "http://localhost:5500",
+                            "http://127.0.0.1:5500"
+                        )
                         .allowedMethods("*");
             }
         };
