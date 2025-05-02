@@ -1,11 +1,17 @@
+# Usa JDK 17 como base
 FROM eclipse-temurin:17
 
+# Crea carpeta de trabajo
 WORKDIR /app
 
-COPY . .
+# Copia el contenido del backend
+COPY academia-baile-backend /app
 
-RUN ./mvnw clean package -DskipTests
+# Da permisos y compila con Maven Wrapper (ya que usas ./mvnw)
+RUN chmod +x ./mvnw && ./mvnw clean package -DskipTests
 
+# Expone el puerto de Spring Boot
 EXPOSE 8080
 
-CMD ["java", "-jar", "target/academia-baile-backend-0.0.1-SNAPSHOT.jar"]
+# Ejecuta el .jar (ajustado al path generado)
+CMD ["java", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
