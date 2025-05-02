@@ -33,7 +33,8 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://marvelous-snickerdoodle-04c3ef.netlify.app")
+                .allowedOrigins("https://marvelous-snickerdoodle-04c3ef.netlify.app", "http://127.0.0.1:5500")
+
                         .allowedMethods("*");
             }
         };
