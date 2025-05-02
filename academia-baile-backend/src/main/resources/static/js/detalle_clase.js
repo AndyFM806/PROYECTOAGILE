@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Obtener info general de la clase
-  fetch(`http://localhost:8081/api/clases`)
+  fetch(`http://localhost:8080/api/clases`)
     .then(response => response.json())
     .then(clases => {
       const claseSeleccionada = clases.find(clase => clase.id === parseInt(claseId));
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error("Error cargando la clase:", error));
 
   // Obtener niveles desde clase_nivel (DTO plano)
-  fetch(`http://localhost:8081/api/clases/${claseId}/niveles`)
+  fetch(`http://localhost:8080/api/clases/${claseId}/niveles`)
     .then(response => response.json())
     .then(niveles => {
       const contenedor = document.getElementById('niveles-clase');

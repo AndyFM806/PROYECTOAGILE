@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const contenedor = document.getElementById('lista-clases');
 
-  fetch('http://localhost:8081/api/clases') // asegúrate que el puerto es correcto
+  fetch('http://localhost:8080/api/clases') // asegúrate que el puerto es correcto
     .then(response => response.json())
     .then(clases => {
       if (clases.length === 0) {
