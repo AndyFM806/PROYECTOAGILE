@@ -1,11 +1,15 @@
 package com.example.backend.entidades;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -62,4 +66,11 @@ public class Inscripcion {
     public Integer getId() {
         return id;
     }
+    @Column(name = "fecha_inscripcion", updatable = false)
+    private LocalDateTime fechaInscripcion;
+
+    @PrePersist
+    protected void onCreate() {
+    this.fechaInscripcion = LocalDateTime.now();
+}
 }

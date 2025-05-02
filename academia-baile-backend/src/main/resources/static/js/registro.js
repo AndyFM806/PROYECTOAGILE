@@ -1,7 +1,5 @@
-
 let inscripcionId = null;
 
-// Control de pasos
 function mostrarPaso(idPaso) {
   document.querySelectorAll('.step').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.progress-bar div').forEach(p => p.classList.remove('active'));
@@ -19,29 +17,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const precio = params.get('precio');
 
   document.getElementById('clase-seleccionada').value = `Nivel: ${nivel || 'N/A'} | Precio: S/${precio || 'N/A'}`;
+
   window.registrarPaso1 = () => {
-    const nombres = document.querySelector('[name="nombres"]').value.trim();
-    const apellidos = document.querySelector('[name="apellidos"]').value.trim();
-    const correo = document.querySelector('[name="correo"]').value.trim();
-    const direccion = document.querySelector('[name="direccion"]').value.trim();
-    const dni = document.querySelector('[name="dni"]').value.trim();
+    const nombres = document.getElementById("nombres").value.trim();
+    const apellidos = document.getElementById("apellidos").value.trim();
+    const correo = document.getElementById("correo").value.trim();
+    const direccion = document.getElementById("direccion").value.trim();
+    const dni = document.getElementById("dni").value.trim();
+
+    const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    const dniRegex = /^[0-9]{8}$/;
 
     if (!nombres || !apellidos || !correo || !direccion || !dni) {
       alert("Por favor completa todos los campos.");
       return;
     }
 
+    if (!soloLetrasRegex.test(nombres)) {
+      alert("El nombre solo debe contener letras.");
+      return;
+    }
+
+    if (!soloLetrasRegex.test(apellidos)) {
+      alert("El apellido solo debe contener letras.");
+      return;
+    }
+
+    if (!dniRegex.test(dni)) {
+      alert("El DNI debe contener exactamente 8 números.");
+      return;
+    }
+
     const inscripcionDTO = {
-      nombres: document.getElementById("nombres").value,
-      apellidos: document.getElementById("apellidos").value,
-      correo: document.getElementById("correo").value,
-      direccion: document.getElementById("direccion").value,
-      dni: document.getElementById("dni").value,
+      nombres,
+      apellidos,
+      correo,
+      direccion,
+      dni,
       claseNivelId: parseInt(claseNivelId),
       estado: "pendiente"
     };
 
-    console.log("DTO enviado:", dto);
+    console.log("DTO enviado:", inscripcionDTO);
 
     fetch('/api/inscripciones', {
       method: 'POST',

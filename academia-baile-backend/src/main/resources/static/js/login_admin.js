@@ -1,16 +1,16 @@
-const adminEmail = "admin@academia.com";
-const adminPassword = "admin123";
+const adminUsername = "admin123";
+const adminPassword = "123456789";
 
 document.getElementById("admin-login-form").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  const email = document.getElementById("admin-email").value;
-  const password = document.getElementById("admin-password").value;
+  const email = document.getElementById("admin-email").value.trim();
+  const password = document.getElementById("admin-password").value.trim();
 
-  if (email === adminEmail && password === adminPassword) {
+  if (email === adminUsername && password === adminPassword) {
     localStorage.setItem("adminAutenticado", "true");
     window.location.href = "admin_panel.html";
   } else {
-    document.getElementById("login-error").innerText = "Correo o contraseña incorrectos";
+    document.getElementById("login-error").innerText = "Usuario o contraseña incorrectos";
   }
 });

@@ -42,3 +42,8 @@ if (localStorage.getItem("adminAutenticado") !== "true") {
         }
       });
     });
+    document.getElementById("btn-cerrar-sesion").addEventListener("click", function () {
+      localStorage.removeItem("adminAutenticado");
+      window.location.href = "principal.html";
+    });
+    
