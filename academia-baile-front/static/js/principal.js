@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const contenedor = document.getElementById('lista-clases');
 
-  fetch('proyectoagile-production.up.railway.app/api/clases') // asegúrate que el puerto es correcto
+  fetch('https://proyectoagile.onrender.com/api/clases') // asegúrate que el puerto es correcto
     .then(response => response.json())
     .then(clases => {
       if (clases.length === 0) {

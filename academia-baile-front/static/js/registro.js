@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("DTO enviado:", inscripcionDTO);
 
-    fetch('/api/inscripciones', {
+    fetch('https://proyectoagile.onrender.com/api/inscripciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(inscripcionDTO)
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData();
     formData.append("file", archivo);
 
-    fetch(`proyectoagile-production.up.railway.app/api/inscripciones/comprobante/${inscripcionId}`, {
+    fetch(`https://proyectoagile.onrender.com/api/inscripciones/comprobante/${inscripcionId}`, {
       method: 'POST',
       body: formData
     })

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Obtener info general de la clase
-  fetch(`proyectoagile-production.up.railway.app/api/clases`)
+  fetch(`https://proyectoagile.onrender.com/api/clases`)
     .then(response => response.json())
     .then(clases => {
       const claseSeleccionada = clases.find(clase => clase.id === parseInt(claseId));
