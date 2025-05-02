@@ -4,7 +4,7 @@ FROM eclipse-temurin:17
 # Crea carpeta de trabajo
 WORKDIR /app
 
-# Copia el contenido del backend
+# Copia el czontenido del backend
 COPY academia-baile-backend /app
 
 # Da permisos y compila con Maven Wrapper (ya que usas ./mvnw)
