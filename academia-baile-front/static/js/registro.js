@@ -25,29 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const direccion = document.getElementById("direccion").value.trim();
     const dni = document.getElementById("dni").value.trim();
 
-    const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-    const dniRegex = /^[0-9]{8}$/;
-
-    if (!nombres || !apellidos || !correo || !direccion || !dni) {
-      alert("Por favor completa todos los campos.");
-      return;
-    }
-
-    if (!soloLetrasRegex.test(nombres)) {
-      alert("El nombre solo debe contener letras.");
-      return;
-    }
-
-    if (!soloLetrasRegex.test(apellidos)) {
-      alert("El apellido solo debe contener letras.");
-      return;
-    }
-
-    if (!dniRegex.test(dni)) {
-      alert("El DNI debe contener exactamente 8 números.");
-      return;
-    }
-
     const inscripcionDTO = {
       nombres,
       apellidos,
@@ -73,7 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
       inscripcionId = data;
       mostrarPaso('pago');
     })
-    }
+    .catch(err => {
+      alert("Error al registrar inscripción.");
+      console.error(err);
+    });
+  };
 
   window.subirComprobante = () => {
     const archivo = document.getElementById('comprobante').files[0];
