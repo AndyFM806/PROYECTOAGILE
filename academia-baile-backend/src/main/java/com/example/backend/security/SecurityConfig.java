@@ -26,7 +26,7 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .httpBasic(); // puedes cambiar por .formLogin() si quieres usar login con formulario
+            .httpBasic(); // puedes usar .formLogin() si tienes login por formulario
         return http.build();
     }
 
