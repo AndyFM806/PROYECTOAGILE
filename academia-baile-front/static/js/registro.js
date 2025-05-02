@@ -73,11 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inscripcionId = data;
       mostrarPaso('pago');
     })
-    .catch(err => {
-      alert("Error al registrar inscripción.");
-      console.error(err);
-    });
-  };
+    }
 
   window.subirComprobante = () => {
     const archivo = document.getElementById('comprobante').files[0];
