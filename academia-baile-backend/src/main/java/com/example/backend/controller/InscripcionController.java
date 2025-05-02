@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/inscripciones")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://marvelous-snickerdoodle-04c3ef.netlify.app")
 public class InscripcionController {
 
     @Autowired
