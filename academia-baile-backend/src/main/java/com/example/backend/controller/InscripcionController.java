@@ -59,7 +59,7 @@ public class InscripcionController {
         String url = almacenamientoService.guardar(file);
 
         Inscripcion insc = inscripcionRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+            .orElseThrow(() -> new RuntimeException("Inscripción no encontrAda"));
 
         insc.setComprobanteUrl(url);
         inscripcionRepository.save(insc);
