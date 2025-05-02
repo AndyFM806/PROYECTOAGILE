@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData();
     formData.append("file", archivo);
 
-    fetch(`/api/inscripciones/comprobante/${inscripcionId}`, {
+    fetch(`proyectoagile-production.up.railway.app/api/inscripciones/comprobante/${inscripcionId}`, {
       method: 'POST',
       body: formData
     })
