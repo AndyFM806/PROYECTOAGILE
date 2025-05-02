@@ -40,8 +40,7 @@ public class InscripcionController {
         cliente.setCorreo(dto.getCorreo());
         cliente.setDireccion(dto.getDireccion());
         cliente.setDni(dto.getDni());
-        cliente.setClaseNivel(claseNivel); // porque cliente.clase_nivel_id SÍ existe
-        System.out.println("Cliente a guardar: " + cliente.getNombres() + ", DNI: " + cliente.getDni() + ", ClaseNivel ID: " + claseNivel.getId()+ cliente.getApellidos()+", "+ cliente.getCorreo()+", "+ cliente.getDireccion());
+        cliente.setClaseNivel(claseNivel);
         cliente = clienteRepository.save(cliente);
 
         // Crear inscripción
@@ -53,7 +52,6 @@ public class InscripcionController {
         inscripcion = inscripcionRepository.save(inscripcion);
 
         return ResponseEntity.ok(inscripcion.getId());
-
     }
 
     @PostMapping("/comprobante/{id}")

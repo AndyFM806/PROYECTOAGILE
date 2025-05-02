@@ -20,8 +20,6 @@ public class Inscripcion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String comprobanteUrl;
-
     private String estado = "pendiente";
 
     @ManyToOne
@@ -73,4 +71,8 @@ public class Inscripcion {
     protected void onCreate() {
     this.fechaInscripcion = LocalDateTime.now();
 }
+    @Column(name = "comprobante_url")
+    private String comprobanteUrl;
+
+    
 }

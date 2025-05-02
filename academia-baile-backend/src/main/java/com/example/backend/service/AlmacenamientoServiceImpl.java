@@ -1,29 +1,35 @@
 package com.example.backend.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
-
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class AlmacenamientoServiceImpl implements AlmacenamientoService {
 
-    private final String RUTA_BASE = "uploads/";
+    @Autowired
+    private Cloudinary cloudinary;
 
     @Override
-    public String guardar(MultipartFile file) {
+    public String guardar(MultipartFile archivo) {
         try {
-            String nombreArchivo = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path destino = Paths.get(RUTA_BASE + nombreArchivo);
-            Files.createDirectories(destino.getParent());
-            Files.write(destino, file.getBytes());
-            return nombreArchivo;
+            if (archivo.isEmpty()) {
+                throw new RuntimeException("Archivo vacío");
+            }
+
+            // Subir archivo a Cloudinary
+            Map<?, ?> resultado = cloudinary.uploader().upload(archivo.getBytes(), ObjectUtils.emptyMap());
+
+            // Retornar solo la URL segura
+            return resultado.get("secure_url").toString();
+
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar archivo", e);
+            throw new RuntimeException("Error al subir el archivo a Cloudinary: " + e.getMessage(), e);
         }
     }
 }
