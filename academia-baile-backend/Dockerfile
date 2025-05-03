@@ -1,19 +1,23 @@
 FROM eclipse-temurin:17-jdk
 
+# Crear directorio de trabajo
 WORKDIR /app
 
-# Copia el contenido necesario
+# Copiar archivos necesarios
 COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
 COPY src src
+COPY academia-baile-front/static src/main/resources/static
 
-# Da permisos y compila
+# Dar permisos al wrapper
 RUN chmod +x mvnw
-RUN ./mvnw clean install -DskipTests
 
-# Expone el puerto del backend
+# Compilar el proyecto
+RUN ./mvnw clean package -DskipTests
+
+# Exponer el puerto usado por Spring Boot
 EXPOSE 8080
 
-# Ejecuta el .jar final
+# Ejecutar el JAR generado
 CMD ["java", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
