@@ -13,13 +13,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // desactiva CSRF para permitir peticiones POST desde frontend
-                .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/**", "/uploads/**", "/static/**").permitAll() // acceso libre
-                                .anyRequest().authenticated() // lo demás requiere login (por si agregas futuro admin)
-                )
-                .formLogin(login -> login.disable()) // desactiva formulario login
-                .httpBasic(basic -> basic.disable()); // desactiva login básico
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/**", "/uploads/**", "/static/**", "/**").permitAll()
+                .anyRequest().permitAll()
+            )
+            .formLogin(login -> login.disable())
+            .httpBasic(basic -> basic.disable());
 
         return http.build();
     }
