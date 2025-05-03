@@ -22,4 +22,5 @@ RUN ./mvnw clean package -DskipTests
 EXPOSE 8080
 
 # Ejecutar el JAR generado
-CMD ["java", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-cp", "target/backend-0.0.1-SNAPSHOT.jar", "com.academiabaile.backend.BackendApplication"]
+

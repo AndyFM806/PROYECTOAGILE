@@ -96,11 +96,12 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>3.1.5</version>
         <configuration>
-          <mainClass>com.example.backend.BackendApplication</mainClass>
+          <mainClass>com.academiabaile.backend.BackendApplication</mainClass>
         </configuration>
       </plugin>
     </plugins>
   </build>
+  
   
   
 
