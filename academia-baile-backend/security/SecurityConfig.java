@@ -22,5 +22,6 @@ public class SecurityConfig {
             .httpBasic(basic -> basic.disable());
 
         return http.build();
+        System.out.println("SecurityConfig: Filtro de seguridad activo");
     }
 }
