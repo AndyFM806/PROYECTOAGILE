@@ -8,7 +8,6 @@ COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
 COPY src src
-COPY academia-baile-front/static src/main/resources/static
 
 # Dar permisos al wrapper
 RUN chmod +x mvnw
