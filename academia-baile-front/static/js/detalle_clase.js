@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .catch(error => console.error("Error cargando la clase:", error));
 
-  // Obtener niveles desde clase_nivel (DTO plano)
+  // Obtener nivelaes desde clase_nivel (DTO plano)
   fetch(`https://proyectoagile.onrender.com/api/clases/${claseId}/niveles`)
     .then(response => response.json())
     .then(niveles => {
