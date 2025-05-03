@@ -10,11 +10,12 @@ public class WebConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+        
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("https://timbatumbao.onrender.com")
+                        .allowedOrigins("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true);
