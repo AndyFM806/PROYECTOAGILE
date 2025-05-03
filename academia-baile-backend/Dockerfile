@@ -9,13 +9,16 @@ COPY mvnw .
 COPY pom.xml .
 COPY src src
 
+# Crear carpeta de subidas si es necesario
+RUN mkdir -p ./uploads
+
 # Dar permisos al wrapper
 RUN chmod +x mvnw
 
-# Compilar el proyecto
+# Compilar el proyecto (sin tests)
 RUN ./mvnw clean package -DskipTests
 
-# Exponer el puerto usado por Spring Boot
+# Exponer el puerto de Spring Boot
 EXPOSE 8080
 
 # Ejecutar el JAR generado
