@@ -9,6 +9,19 @@ import lombok.Setter;
 @Setter
 public class ClaseNivel {
 
+    @Column(nullable = false)
+    private int aforo;
+
+    public int getAforo() {
+        return aforo;
+    }
+
+    public void setAforo(int aforo) {
+        this.aforo = aforo;
+    }
+    
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

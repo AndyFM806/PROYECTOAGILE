@@ -25,12 +25,13 @@ public class ClaseNivelServiceImpl implements ClaseNivelService {
     }
     
     return lista.stream().map(cn -> new ClaseNivelDTO(
-        
-        cn.getNivel().getNombre(),
-        cn.getHorario().getDias(),
-        cn.getHorario().getHora(),
-        cn.getPrecio()
-    )).collect(Collectors.toList());
+    cn.getNivel().getNombre(),
+    cn.getHorario().getDias(),
+    cn.getHorario().getHora(),
+    cn.getPrecio(),
+    cn.getAforo() // 👈 NUEVO CAMPO
+)).collect(Collectors.toList());
+
     
     }
 }
