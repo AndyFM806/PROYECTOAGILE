@@ -10,5 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
     int countByClaseNivel(ClaseNivel claseNivel);
     List<Cliente> findByClaseNivel_Id(Integer claseNivelId);
-
+    void deleteById(Integer id);
 }

@@ -21,4 +21,16 @@ public class ClienteServiceImpl implements ClienteService {
     public List<Cliente> listarClientes() {
         return clienteRepository.findAll();
     }
+    @Override
+    public void actualizarAnotacion(Integer id, String anotacion) {
+    Cliente cliente = clienteRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    cliente.setAnotacion(anotacion);
+    clienteRepository.save(cliente);
+}
+    @Override
+    public Cliente findById(Integer id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    }
 }

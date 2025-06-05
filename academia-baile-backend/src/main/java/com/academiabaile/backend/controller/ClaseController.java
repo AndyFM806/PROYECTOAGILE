@@ -50,6 +50,7 @@ public class ClaseController {
     public ResponseEntity<List<ClienteDTO>> listarAlumnosPorClaseNivel(@PathVariable Integer id) {
     return ResponseEntity.ok(AlumnosPorClaseService.obtenerAlumnosPorClaseNivel(id));
 }
+    
 }
 
 

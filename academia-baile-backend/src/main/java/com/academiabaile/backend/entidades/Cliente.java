@@ -18,6 +18,9 @@ public class Cliente {
     @JoinColumn(name = "clase_nivel_id")
     private ClaseNivel claseNivel;
 
+    @Column(name = "anotacion", columnDefinition = "TEXT")
+    private String anotacion;
+
 
     @Column(name = "nombres")
     private String nombres;
@@ -44,6 +47,9 @@ public class Cliente {
 
     public void setDni(String dni) {
         this.dni = dni;
+    }
+    public void setAnotacion(String anotacion) {
+        this.anotacion = anotacion;
     }
     }
 
