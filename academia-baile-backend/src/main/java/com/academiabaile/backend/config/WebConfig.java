@@ -15,7 +15,10 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("https://timbatumbao-front.onrender.com/")
+                        .allowedOrigins(
+                            "https://timbatumbao-front.onrender.com",
+                            "http://localhost:5500"  // <-- este es el frontend local (VSCode)
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true);

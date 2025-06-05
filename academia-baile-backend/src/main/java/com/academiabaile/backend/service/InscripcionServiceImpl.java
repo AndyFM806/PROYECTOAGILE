@@ -33,8 +33,7 @@ public Integer registrar(InscripcionDTO dto) {
     cliente.setCorreo(dto.getCorreo());
     cliente.setDireccion(dto.getDireccion());
     cliente.setDni(dto.getDni());
-    cliente = clienteRepository.save(cliente); // Importante
-
+    cliente = clienteRepository.save(cliente); 
     // Buscar ClaseNivel
     List<ClaseNivel> resultados = claseNivelRepository.findByClaseId(dto.getClaseNivelId());
     if (resultados.isEmpty()) {

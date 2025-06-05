@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(origins = "https://timbatumbao-front.onrender.com")
+@CrossOrigin(origins = {"https://timbatumbao-front.onrender.com", "http://localhost:5500"})
 public class ClienteController {
 
     @Autowired
