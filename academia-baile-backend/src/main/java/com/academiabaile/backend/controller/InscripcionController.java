@@ -1,10 +1,13 @@
 package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.entidades.*;
-import com.academiabaile.backend.repository.ClaseNivelRepository;
-import com.academiabaile.backend.repository.ClienteRepository;
 import com.academiabaile.backend.repository.InscripcionRepository;
 import com.academiabaile.backend.service.AlmacenamientoService;
+import com.academiabaile.backend.service.AuditoriaService;
+import com.academiabaile.backend.service.InscripcionService;
+import com.academiabaile.backend.service.MercadoPagoRestService;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,45 +16,68 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/inscripciones")
 public class InscripcionController {
-
+    @Autowired
+    private InscripcionService inscripcionService;
     @Autowired
     private InscripcionRepository inscripcionRepository;
 
     @Autowired
-    private ClaseNivelRepository claseNivelRepository;
-
-    @Autowired
-    private ClienteRepository clienteRepository;
-
-    @Autowired
     private AlmacenamientoService almacenamientoService;
+    @Autowired
+    private AuditoriaService auditoriaService;
+    
+    
+@PostMapping
+public ResponseEntity<?> registrar(@RequestBody InscripcionDTO dto) {
+    try {
+        Integer id = inscripcionService.registrar(dto);
+        
+        auditoriaService.registrar(
+            "sistema", // o "cliente_" + dto.getDni() si quieres más detalle
+            "NUEVA_INSCRIPCION",
+            "Se registró una inscripción pendiente con ID " + id + " para cliente DNI: " + dto.getDni()
+        );
 
-    @PostMapping
-    public ResponseEntity<?> registrar(@RequestBody InscripcionDTO dto) {
-        // Obtener claseNivel
-        ClaseNivel claseNivel = claseNivelRepository.findById(dto.getClaseNivelId())
-            .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada con ID: " + dto.getClaseNivelId()));
-
-        // Crear cliente
-        Cliente cliente = new Cliente();
-        cliente.setNombres(dto.getNombres());
-        cliente.setApellidos(dto.getApellidos());
-        cliente.setCorreo(dto.getCorreo());
-        cliente.setDireccion(dto.getDireccion());
-        cliente.setDni(dto.getDni());
-        cliente.setClaseNivel(claseNivel);
-        cliente = clienteRepository.save(cliente);
-
-        // Crear inscripción
-        Inscripcion inscripcion = new Inscripcion();
-        inscripcion.setCliente(cliente);
-        inscripcion.setClaseNivel(claseNivel);
-        inscripcion.setEstado(dto.getEstado() != null ? dto.getEstado() : "pendiente");
-
-        inscripcion = inscripcionRepository.save(inscripcion);
-
-        return ResponseEntity.ok(inscripcion.getId());
+        return ResponseEntity.ok("Inscripción registrada con ID: " + id);
+    } catch (RuntimeException e) {
+        auditoriaService.registrar(
+            "sistema",
+            "ERROR_INSCRIPCION",
+            "Error al intentar registrar inscripción para DNI: " + dto.getDni() + ". Motivo: " + e.getMessage()
+        );
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
+}
+    
+
+        @PatchMapping("/{id}/aprobar")
+public ResponseEntity<?> aprobar(@PathVariable Integer id) {
+    try {
+        Inscripcion insc = inscripcionRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
+        insc.setEstado("aprobada");
+        inscripcionRepository.save(insc);
+
+        auditoriaService.registrar(
+            "admin",
+            "APROBACION_INSCRIPCION",
+            "Se aprobó la inscripción ID " + id + " del cliente DNI: " + insc.getCliente().getDni()
+        );
+
+        return ResponseEntity.ok("Inscripción aprobada");
+    } catch (RuntimeException e) {
+        auditoriaService.registrar(
+            "admin",
+            "ERROR_APROBACION",
+            "Error al aprobar inscripción ID " + id + ": " + e.getMessage()
+        );
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+
+
+
 
     @PostMapping("/comprobante/{id}")
     public ResponseEntity<?> subirComprobante(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
@@ -65,4 +91,65 @@ public class InscripcionController {
 
         return ResponseEntity.ok("Comprobante subido");
     }
+    @Autowired
+    private MercadoPagoRestService mpService;
+
+    @PostMapping("/generar-pago/{inscripcionId}")
+    public ResponseEntity<?> generarPago(@PathVariable Integer inscripcionId) {
+        Inscripcion insc = inscripcionRepository.findById(inscripcionId)
+        .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
+    String nombre = insc.getClaseNivel().getClase().getNombre() + " - " + insc.getClaseNivel().getNivel().getNombre();
+    Double precio = insc.getClaseNivel().getPrecio();
+
+    String urlPago = mpService.crearPreferencia(precio, nombre, inscripcionId);
+
+    return ResponseEntity.ok(urlPago);
+}
+
+    @PatchMapping("/{id}/aprobar")
+public ResponseEntity<?> aprobarInscripcion(@PathVariable Integer id) {
+    Inscripcion insc = inscripcionRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
+    if (!"pendiente".equalsIgnoreCase(insc.getEstado())) {
+        return ResponseEntity.badRequest().body("Esta inscripción ya fue procesada");
+    }
+
+    insc.setEstado("aprobada");
+    inscripcionRepository.save(insc);
+
+    auditoriaService.registrar("admin", "APROBACION_MANUAL", "Admin aprobó inscripción ID " + id);
+
+    return ResponseEntity.ok("Inscripción aprobada");
+}
+    @PatchMapping("/{id}/rechazar")
+public ResponseEntity<?> rechazarInscripcion(@PathVariable Integer id) {
+    Inscripcion insc = inscripcionRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
+    if (!"pendiente".equalsIgnoreCase(insc.getEstado())) {
+        return ResponseEntity.badRequest().body("Esta inscripción ya fue procesada");
+    }
+
+    insc.setEstado("rechazada");
+    inscripcionRepository.save(insc);
+
+    auditoriaService.registrar("admin", "RECHAZO_MANUAL", "Admin rechazó inscripción ID " + id);
+
+    return ResponseEntity.ok("Inscripción rechazada");
+}
+    @GetMapping("/pendientes-con-comprobante")
+public ResponseEntity<?> listarPendientesConComprobante() {
+    List<Inscripcion> lista = inscripcionRepository.findByEstadoAndComprobanteUrlIsNotNull("pendiente");
+
+    auditoriaService.registrar(
+        "admin",
+        "CONSULTA_INSCRIPCIONES_PENDIENTES",
+        "Admin consultó lista de inscripciones con comprobante pendiente"
+    );
+
+    return ResponseEntity.ok(lista);
+}
+
 }

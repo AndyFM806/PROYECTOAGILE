@@ -12,6 +12,8 @@ public class InscripcionDTO {
     private String dni;
     private Integer claseNivelId;
     private String estado;
+    private String metodoPago; // "comprobante" o "pasarela"
+
 
     public InscripcionDTO() {}
 }

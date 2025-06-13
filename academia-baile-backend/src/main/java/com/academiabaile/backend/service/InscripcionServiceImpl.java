@@ -2,7 +2,6 @@ package com.academiabaile.backend.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 import com.academiabaile.backend.entidades.InscripcionDTO;
 import com.academiabaile.backend.entidades.Cliente;
@@ -24,8 +23,24 @@ public class InscripcionServiceImpl implements InscripcionService {
     @Autowired
     private InscripcionRepository inscripcionRepository;
 
-    @Override
+    
+@Override
 public Integer registrar(InscripcionDTO dto) {
+    ClaseNivel claseNivel = claseNivelRepository.findById(dto.getClaseNivelId())
+        .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada"));
+
+    // Validar aforo
+    int inscritos = inscripcionRepository.countByClaseNivelAndEstado(claseNivel, "aprobada");
+    if (inscritos >= claseNivel.getAforo()) {
+        throw new RuntimeException("Clase llena");
+    }
+
+    // Validar duplicado
+    boolean yaInscrito = clienteRepository.existsByDniAndClaseNivel_Id(dto.getDni(), dto.getClaseNivelId());
+    if (yaInscrito) {
+        throw new RuntimeException("Ya inscrito en esta clase");
+    }
+
     // Crear cliente
     Cliente cliente = new Cliente();
     cliente.setNombres(dto.getNombres());
@@ -33,21 +48,22 @@ public Integer registrar(InscripcionDTO dto) {
     cliente.setCorreo(dto.getCorreo());
     cliente.setDireccion(dto.getDireccion());
     cliente.setDni(dto.getDni());
-    cliente = clienteRepository.save(cliente); 
-    // Buscar ClaseNivel
-    List<ClaseNivel> resultados = claseNivelRepository.findByClaseId(dto.getClaseNivelId());
-    if (resultados.isEmpty()) {
-        throw new RuntimeException("No se encontró ClaseNivel con ID " + dto.getClaseNivelId());
-    }
-    ClaseNivel claseNivel = resultados.get(0);
+    cliente = clienteRepository.save(cliente);
 
     // Crear inscripción
     Inscripcion inscripcion = new Inscripcion();
     inscripcion.setCliente(cliente);
     inscripcion.setClaseNivel(claseNivel);
     inscripcion.setEstado("pendiente");
-    
+
+    if ("pasarela".equalsIgnoreCase(dto.getMetodoPago())) {
+        // Simulación de validación exitosa de pasarela (puedes reemplazar por lógica real)
+        inscripcion.setEstado("aprobada");
+    }
+
     inscripcion = inscripcionRepository.save(inscripcion);
     return inscripcion.getId();
+}
 
-}}
+
+}
