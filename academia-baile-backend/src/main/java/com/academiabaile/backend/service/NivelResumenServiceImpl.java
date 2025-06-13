@@ -28,7 +28,8 @@ public List<NivelResumenDTO> obtenerResumenNivelesPorClase(Integer claseId) {
         NivelResumenDTO dto = new NivelResumenDTO();
         dto.setNivel(nivel.getNivel().getNombre());
         dto.setHorario(nivel.getHorario().getHora());
-        dto.setInscritos(ClienteRepository.countByClaseNivel(nivel));
+        dto.setInscritos((int) ClienteRepository.countByClaseNivel(nivel));
+
         return dto;
     }).collect(Collectors.toList());
 }
