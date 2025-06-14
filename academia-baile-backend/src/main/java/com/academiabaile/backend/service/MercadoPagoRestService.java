@@ -93,7 +93,7 @@ public class MercadoPagoRestService {
                     "failure", failureUrl,
                     "pending", pendingUrl
             ));
-            body.put("payer", payer);
+            // body.put("payer", payer);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
             ResponseEntity<Map> response = restTemplate.postForEntity(
