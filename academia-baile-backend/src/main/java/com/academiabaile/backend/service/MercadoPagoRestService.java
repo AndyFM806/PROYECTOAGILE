@@ -56,7 +56,8 @@ public class MercadoPagoRestService {
         );
 
         // Devolver init_point
-        return response.getBody().get("init_point").toString();
+        return response.getBody().get("sandbox_init_point").toString();
+
     }
     public boolean pagoEsAprobado(String paymentId) {
     RestTemplate restTemplate = new RestTemplate();
