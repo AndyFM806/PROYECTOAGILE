@@ -28,28 +28,28 @@ public class MercadoPagoRestService {
     }
 
     public String crearPreferencia(Double precioOriginal, String nombreClase, Integer inscripcionId) {
+    try {
         RestTemplate restTemplate = new RestTemplate();
 
-        // Obtener inscripción y datos relacionados
         Inscripcion insc = inscripcionRepository.findById(inscripcionId).orElseThrow();
         ClaseNivel claseNivel = insc.getClaseNivel();
         Integer claseNivelId = claseNivel.getId();
         String nivel = claseNivel.getNivel().getNombre();
         Double precioClase = claseNivel.getPrecio();
 
-        // Si hay nota de crédito y monto pendiente < precio total, usar ese monto
+        // Monto final con nota de crédito si aplica
         Double montoFinal = precioClase;
         NotaCredito nota = insc.getNotaCredito();
         if (nota != null && insc.getMontoPendiente() != null && insc.getMontoPendiente() > 0) {
             montoFinal = insc.getMontoPendiente();
         }
 
-        // URLs de retorno codificadas con parámetros
+        // Construcción de URLs de retorno
         String baseUrl = "https://timbatumbao-front.onrender.com/html/registro.html";
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .queryParam("id", claseNivelId)
                 .queryParam("nivel", nivel)
-                .queryParam("precio", precioClase); // mostrar el precio completo
+                .queryParam("precio", precioClase);
 
         String successUrl = builder.cloneBuilder().queryParam("estado", "exito").toUriString();
         String failureUrl = builder.cloneBuilder().queryParam("estado", "fallo").toUriString();
@@ -67,10 +67,10 @@ public class MercadoPagoRestService {
                 "unit_price", montoFinal
         );
 
-        // Payer
+        // Payer seguro
         Map<String, Object> payer = Map.of(
                 "name", insc.getCliente().getNombres(),
-                "surname", insc.getCliente().getApellidos() != null ? insc.getCliente().getApellidos() : "",
+                "surname", Optional.ofNullable(insc.getCliente().getApellidos()).orElse(""),
                 "email", insc.getCliente().getCorreo(),
                 "identification", Map.of(
                         "type", "DNI",
@@ -78,7 +78,7 @@ public class MercadoPagoRestService {
                 )
         );
 
-        // Body
+        // Cuerpo de la preferencia
         Map<String, Object> body = new HashMap<>();
         body.put("items", List.of(item));
         body.put("metadata", Map.of("inscripcion_id", inscripcionId));
@@ -91,7 +91,6 @@ public class MercadoPagoRestService {
         body.put("auto_return", "approved");
         body.put("payer", payer);
 
-        // POST a Mercado Pago
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(
                 "https://api.mercadopago.com/checkout/preferences",
@@ -99,9 +98,20 @@ public class MercadoPagoRestService {
                 Map.class
         );
 
-        // Retornar URL de pago en sandbox
-        return response.getBody().get("sandbox_init_point").toString();
+        Object sandboxUrl = response.getBody().get("sandbox_init_point");
+        if (sandboxUrl == null) {
+            throw new RuntimeException("No se pudo obtener sandbox_init_point desde MercadoPago");
+        }
+
+        return sandboxUrl.toString();
+
+    } catch (Exception e) {
+        auditoriaService.registrar("sistema", "ERROR_MP_PREFERENCIA",
+                "Error al generar preferencia para inscripción ID " + inscripcionId + ": " + e.getMessage());
+        throw new RuntimeException("Error al generar preferencia de pago: " + e.getMessage());
     }
+}
+
 
     public boolean pagoEsAprobado(String paymentId) {
         RestTemplate restTemplate = new RestTemplate();
