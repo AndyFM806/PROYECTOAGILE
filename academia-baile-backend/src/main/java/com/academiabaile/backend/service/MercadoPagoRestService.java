@@ -81,12 +81,23 @@ public class MercadoPagoRestService {
         body.put("metadata", Map.of("inscripcion_id", inscripcionId));
         body.put("notification_url", "https://timbatumbao-back.onrender.com/api/pagos/webhook");
         body.put("auto_return", "approved");
-
         body.put("back_urls", Map.of(
-                "success", successUrl,
-                "failure", failureUrl,
-                "pending", pendingUrl
+            "success", successUrl,
+            "failure", failureUrl,
+            "pending", pendingUrl
         ));
+
+        // 🔥 Agrega este bloque nuevo
+        body.put("payer", Map.of(
+            "name", insc.getCliente().getNombres(),
+            "surname", insc.getCliente().getApellidos(),
+            "email", insc.getCliente().getCorreo(),
+            "identification", Map.of(
+                "type", "DNI",
+                "number", insc.getCliente().getDni()
+            )
+        ));
+
 
         // Enviar POST a Mercado Pago
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
