@@ -29,14 +29,25 @@ public class MercadoPagoRestService {
     public String crearPreferencia(Double precio, String nombreClase, Integer inscripcionId) {
         RestTemplate restTemplate = new RestTemplate();
 
-        // Obtener datos de clase para la inscripción
-        Inscripcion insc = inscripcionRepository.findById(inscripcionId).orElseThrow();
+        // Validación básica
+        if (precio == null || inscripcionId == null) {
+            throw new IllegalArgumentException("Datos de inscripción inválidos");
+        }
+
+        // Obtener datos de la inscripción
+        Inscripcion insc = inscripcionRepository.findById(inscripcionId)
+                .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
         ClaseNivel claseNivel = insc.getClaseNivel();
+        if (claseNivel == null || claseNivel.getNivel() == null || claseNivel.getClase() == null) {
+            throw new RuntimeException("Clase o nivel no configurado correctamente para esta inscripción.");
+        }
+
         Integer claseNivelId = claseNivel.getId();
         String nombreNivel = claseNivel.getNivel().getNombre();
         Double precioClase = claseNivel.getPrecio();
 
-        // Construcción segura de URLs de retorno
+        // ✅ Construcción segura de URLs
         String baseUrl = "https://timbatumbao-front.onrender.com/html/registro.html";
 
         String successUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
@@ -63,79 +74,96 @@ public class MercadoPagoRestService {
                 .build()
                 .toUriString();
 
-        // Headers con token
+        // ✅ Headers con token de acceso
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Datos del producto
+        // ✅ Datos del producto
         Map<String, Object> item = Map.of(
                 "title", "Inscripción: " + nombreClase,
                 "quantity", 1,
                 "unit_price", precio
         );
 
-        // Construcción del cuerpo de la solicitud
+        // ✅ Estructura del cuerpo de la solicitud
         Map<String, Object> body = new HashMap<>();
         body.put("items", List.of(item));
         body.put("metadata", Map.of("inscripcion_id", inscripcionId));
         body.put("notification_url", "https://timbatumbao-back.onrender.com/api/pagos/webhook");
         body.put("auto_return", "approved");
         body.put("back_urls", Map.of(
-            "success", successUrl,
-            "failure", failureUrl,
-            "pending", pendingUrl
+                "success", successUrl,
+                "failure", failureUrl,
+                "pending", pendingUrl
         ));
 
-        // 🔥 Agrega este bloque nuevo
-        body.put("payer", Map.of(
-            "name", insc.getCliente().getNombres(),
-            "surname", insc.getCliente().getApellidos(),
-            "email", insc.getCliente().getCorreo(),
-            "identification", Map.of(
-                "type", "DNI",
-                "number", insc.getCliente().getDni()
-            )
-        ));
+        // ✅ Datos del comprador (payer)
+        if (insc.getCliente() != null) {
+            body.put("payer", Map.of(
+                    "name", Optional.ofNullable(insc.getCliente().getNombres()).orElse(""),
+                    "surname", Optional.ofNullable(insc.getCliente().getApellidos()).orElse(""),
+                    "email", Optional.ofNullable(insc.getCliente().getCorreo()).orElse(""),
+                    "identification", Map.of(
+                            "type", "DNI",
+                            "number", Optional.ofNullable(insc.getCliente().getDni()).orElse("00000000")
+                    )
+            ));
+        }
 
+        // ✅ Enviar POST a Mercado Pago
+        try {
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                    "https://api.mercadopago.com/checkout/preferences",
+                    entity,
+                    Map.class
+            );
 
-        // Enviar POST a Mercado Pago
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<Map> response = restTemplate.postForEntity(
-                "https://api.mercadopago.com/checkout/preferences",
-                entity,
-                Map.class
-        );
+            Object sandboxUrl = response.getBody().get("sandbox_init_point");
+            if (sandboxUrl == null) {
+                throw new RuntimeException("No se obtuvo el enlace de pago.");
+            }
 
-        return response.getBody().get("sandbox_init_point").toString();
+            return sandboxUrl.toString();
+        } catch (Exception e) {
+            auditoriaService.registrar("sistema", "ERROR_MERCADOPAGO", "Error al crear preferencia: " + e.getMessage());
+            throw new RuntimeException("Error al crear preferencia en Mercado Pago", e);
+        }
     }
 
     public boolean pagoEsAprobado(String paymentId) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> resp = restTemplate.exchange(
-                "https://api.mercadopago.com/v1/payments/" + paymentId,
-                HttpMethod.GET,
-                entity,
-                Map.class
-        );
+            ResponseEntity<Map> resp = restTemplate.exchange(
+                    "https://api.mercadopago.com/v1/payments/" + paymentId,
+                    HttpMethod.GET,
+                    entity,
+                    Map.class
+            );
 
-        String status = resp.getBody().get("status").toString();
-        Map metadata = (Map) resp.getBody().get("metadata");
-        Integer inscripcionId = (Integer) metadata.get("inscripcion_id");
+            String status = (String) resp.getBody().get("status");
+            Map metadata = (Map) resp.getBody().get("metadata");
+            Integer inscripcionId = (Integer) metadata.get("inscripcion_id");
 
-        if ("approved".equals(status)) {
-            Inscripcion insc = inscripcionRepository.findById(inscripcionId).orElseThrow();
-            insc.setEstado("aprobada");
-            inscripcionRepository.save(insc);
-            auditoriaService.registrar("sistema", "PAGO_APROBADO", "Pago aprobado para inscripción ID " + inscripcionId);
-            return true;
+            if ("approved".equalsIgnoreCase(status)) {
+                Inscripcion insc = inscripcionRepository.findById(inscripcionId).orElseThrow();
+                insc.setEstado("aprobada");
+                inscripcionRepository.save(insc);
+                auditoriaService.registrar("sistema", "PAGO_APROBADO", "Pago aprobado para inscripción ID " + inscripcionId);
+                return true;
+            } else {
+                auditoriaService.registrar("sistema", "PAGO_NO_APROBADO", "Estado: " + status + " para inscripción ID " + inscripcionId);
+                return false;
+            }
+
+        } catch (Exception e) {
+            auditoriaService.registrar("sistema", "ERROR_VERIFICACION_PAGO", "Error al verificar pago ID " + paymentId + ": " + e.getMessage());
+            return false;
         }
-
-        auditoriaService.registrar("sistema", "PAGO_RECHAZADO", "Pago rechazado. ID " + paymentId);
-        return false;
     }
 }
