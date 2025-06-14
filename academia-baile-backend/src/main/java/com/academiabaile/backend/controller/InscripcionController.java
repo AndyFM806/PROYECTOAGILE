@@ -4,6 +4,7 @@ import com.academiabaile.backend.entidades.*;
 import com.academiabaile.backend.repository.InscripcionRepository;
 import com.academiabaile.backend.service.AlmacenamientoService;
 import com.academiabaile.backend.service.AuditoriaService;
+import com.academiabaile.backend.service.EmailService;
 import com.academiabaile.backend.service.InscripcionService;
 import com.academiabaile.backend.service.MercadoPagoRestService;
 
@@ -17,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/inscripciones")
 public class InscripcionController {
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private InscripcionService inscripcionService;
@@ -44,6 +47,12 @@ public class InscripcionController {
                 "NUEVA_INSCRIPCION",
                 "Se registró una inscripción pendiente con ID " + id + " para cliente DNI: " + dto.getDni()
             );
+            emailService.enviarCorreo(
+            dto.getCorreo(),
+            "Registro de inscripción recibido",
+            "Hola " + dto.getNombres() + ", hemos recibido tu solicitud de inscripción en la clase seleccionada. Te confirmaremos pronto."
+        );
+
 
             return ResponseEntity.ok("Inscripción registrada con ID: " + id);
         } catch (RuntimeException e) {
@@ -71,6 +80,11 @@ public class InscripcionController {
                 "APROBACION_INSCRIPCION",
                 "Se aprobó la inscripción ID " + id + " del cliente DNI: " + insc.getCliente().getDni()
             );
+            emailService.enviarCorreo(
+            insc.getCliente().getCorreo(),
+            "Inscripción aprobada",
+            "Hola " + insc.getCliente().getNombres() + ", tu inscripción ha sido aprobada exitosamente. ¡Bienvenido a la academia Timba Tumbao!"
+    );
 
             return ResponseEntity.ok("Inscripción aprobada");
         } catch (RuntimeException e) {
@@ -85,39 +99,59 @@ public class InscripcionController {
 
     // Aprobar inscripción (manual) — se cambió la ruta para evitar conflico
     @PatchMapping("/{id}/aprobar-manual")
-    public ResponseEntity<?> aprobarInscripcion(@PathVariable Integer id) {
-        Inscripcion insc = inscripcionRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+public ResponseEntity<?> aprobarInscripcion(@PathVariable Integer id) {
+    Inscripcion insc = inscripcionRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
 
-        if (!"pendiente".equalsIgnoreCase(insc.getEstado())) {
-            return ResponseEntity.badRequest().body("Esta inscripción ya fue procesada");
-        }
-
-        insc.setEstado("aprobada");
-        inscripcionRepository.save(insc);
-
-        auditoriaService.registrar("admin", "APROBACION_MANUAL", "Admin aprobó inscripción ID " + id);
-
-        return ResponseEntity.ok("Inscripción aprobada");
+    if (!"pendiente".equalsIgnoreCase(insc.getEstado())) {
+        return ResponseEntity.badRequest().body("Esta inscripción ya fue procesada");
     }
 
+    insc.setEstado("aprobada");
+    inscripcionRepository.save(insc);
+
+    auditoriaService.registrar("admin", "APROBACION_MANUAL", "Admin aprobó inscripción ID " + id);
+
+    // Enviar correo al cliente
+    String correo = insc.getCliente().getCorreo();
+    String asunto = "Inscripción aprobada - Timba Tumbao";
+    String mensaje = String.format("Hola %s,\n\nTu inscripción en la clase '%s - %s' ha sido aprobada. ¡Te esperamos!",
+        insc.getCliente().getNombres(),
+        insc.getClaseNivel().getClase().getNombre(),
+        insc.getClaseNivel().getNivel().getNombre());
+
+    emailService.enviarCorreo(correo, asunto, mensaje);
+
+    return ResponseEntity.ok("Inscripción aprobada");
+}
     // Rechazar inscripción
     @PatchMapping("/{id}/rechazar")
-    public ResponseEntity<?> rechazarInscripcion(@PathVariable Integer id) {
-        Inscripcion insc = inscripcionRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+public ResponseEntity<?> rechazarInscripcion(@PathVariable Integer id) {
+    Inscripcion insc = inscripcionRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
 
-        if (!"pendiente".equalsIgnoreCase(insc.getEstado())) {
-            return ResponseEntity.badRequest().body("Esta inscripción ya fue procesada");
-        }
-
-        insc.setEstado("rechazada");
-        inscripcionRepository.save(insc);
-
-        auditoriaService.registrar("admin", "RECHAZO_MANUAL", "Admin rechazó inscripción ID " + id);
-
-        return ResponseEntity.ok("Inscripción rechazada");
+    if (!"pendiente".equalsIgnoreCase(insc.getEstado())) {
+        return ResponseEntity.badRequest().body("Esta inscripción ya fue procesada");
     }
+
+    insc.setEstado("rechazada");
+    inscripcionRepository.save(insc);
+
+    auditoriaService.registrar("admin", "RECHAZO_MANUAL", "Admin rechazó inscripción ID " + id);
+
+    // Enviar correo al cliente
+    String correo = insc.getCliente().getCorreo();
+    String asunto = "Inscripción rechazada - Timba Tumbao";
+    String mensaje = String.format("Hola %s,\n\nLamentamos informarte que tu inscripción en la clase '%s - %s' ha sido rechazada. Puedes intentarlo nuevamente o contactarnos para más información.",
+        insc.getCliente().getNombres(),
+        insc.getClaseNivel().getClase().getNombre(),
+        insc.getClaseNivel().getNivel().getNombre());
+
+    emailService.enviarCorreo(correo, asunto, mensaje);
+
+    return ResponseEntity.ok("Inscripción rechazada");
+}
+
 
     // Subir comprobante de pago
     @PostMapping("/comprobante/{id}")
