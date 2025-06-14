@@ -5,6 +5,8 @@ public class ClienteDTO {
     private String apellidos;
     private String dni;
     private String correo;
+    private String direccion;
+
     public String getNombres() {
         return nombres;
     }
@@ -36,4 +38,13 @@ public class ClienteDTO {
     public void setCorreo(String correo) {
         this.correo = correo;
     }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+    // Getters  y setters
 }

@@ -18,13 +18,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/clases")
 @CrossOrigin(origins = {"https://timbatumbao-front.onrender.com", "http://localhost:5500"})
-
 public class ClaseController {
-    @Autowired
-    private NivelResumenService claseNivelService1;
 
     @Autowired
-    private AlumnosPorClaseService AlumnosPorClaseService;
+    private NivelResumenService nivelResumenService;
+
+    @Autowired
+    private AlumnosPorClaseService alumnosPorClaseService;
 
     @Autowired
     private ClaseService claseService;
@@ -39,19 +39,16 @@ public class ClaseController {
 
     @GetMapping("/{id}/niveles")
     public ResponseEntity<List<ClaseNivelDTO>> obtenerNivelesPorClase(@PathVariable Integer id) {
-    return ResponseEntity.ok(claseNivelService.obtenerNivelesPorClase(id));
-}
+        return ResponseEntity.ok(claseNivelService.obtenerNivelesPorClase(id));
+    }
+
     @GetMapping("/{id}/niveles-resumen")
     public ResponseEntity<List<NivelResumenDTO>> obtenerResumenNiveles(@PathVariable Integer id) {
-    return ResponseEntity.ok(claseNivelService1.obtenerResumenNivelesPorClase(id));
-}
+        return ResponseEntity.ok(nivelResumenService.obtenerResumenNivelesPorClase(id));
+    }
 
     @GetMapping("/{id}/alumnos")
     public ResponseEntity<List<ClienteDTO>> listarAlumnosPorClaseNivel(@PathVariable Integer id) {
-    return ResponseEntity.ok(AlumnosPorClaseService.obtenerAlumnosPorClaseNivel(id));
+        return ResponseEntity.ok(alumnosPorClaseService.obtenerAlumnosPorClaseNivel(id));
+    }
 }
-    
-}
-
-
-

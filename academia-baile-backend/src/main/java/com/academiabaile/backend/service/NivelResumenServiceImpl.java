@@ -9,29 +9,30 @@ import org.springframework.stereotype.Service;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.NivelResumenDTO;
 import com.academiabaile.backend.repository.ClaseNivelRepository;
-import com.academiabaile.backend.repository.ClienteRepository;
+import com.academiabaile.backend.repository.InscripcionRepository;
 
 @Service
 public class NivelResumenServiceImpl implements NivelResumenService {
-   @Autowired
-private ClaseNivelRepository ClaseNivelRepository;
 
-@Autowired
-private ClienteRepository ClienteRepository;
+    @Autowired
+    private ClaseNivelRepository claseNivelRepository;
 
+    @Autowired
+    private InscripcionRepository inscripcionRepository;
 
     @Override
-public List<NivelResumenDTO> obtenerResumenNivelesPorClase(Integer claseId) {
-    List<ClaseNivel> niveles = ClaseNivelRepository.findByClaseId(claseId);
+    public List<NivelResumenDTO> obtenerResumenNivelesPorClase(Integer claseId) {
+        List<ClaseNivel> niveles = claseNivelRepository.findByClaseId(claseId);
 
-    return niveles.stream().map(nivel -> {
-        NivelResumenDTO dto = new NivelResumenDTO();
-        dto.setNivel(nivel.getNivel().getNombre());
-        dto.setHorario(nivel.getHorario().getHora());
-        dto.setInscritos((int) ClienteRepository.countByClaseNivel(nivel));
+        return niveles.stream().map(nivel -> {
+            NivelResumenDTO dto = new NivelResumenDTO();
+            dto.setNivel(nivel.getNivel().getNombre());
+            dto.setHorario(nivel.getHorario().getHora());
 
-        return dto;
-    }).collect(Collectors.toList());
-}
+            int inscritos = inscripcionRepository.countByClaseNivelAndEstado(nivel, "aprobada");
+            dto.setInscritos(inscritos);
 
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }

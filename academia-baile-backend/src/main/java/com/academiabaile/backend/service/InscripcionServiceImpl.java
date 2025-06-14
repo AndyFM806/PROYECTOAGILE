@@ -35,20 +35,22 @@ public Integer registrar(InscripcionDTO dto) {
         throw new RuntimeException("Clase llena");
     }
 
-    // Validar duplicado
-    boolean yaInscrito = clienteRepository.existsByDniAndClaseNivel_Id(dto.getDni(), dto.getClaseNivelId());
+
+    Cliente cliente = clienteRepository.findByDni(dto.getDni()).orElseGet(() -> {
+    Cliente nuevo = new Cliente();
+    nuevo.setNombres(dto.getNombres());
+    nuevo.setApellidos(dto.getApellidos());
+    nuevo.setCorreo(dto.getCorreo());
+    nuevo.setDireccion(dto.getDireccion());
+    nuevo.setDni(dto.getDni());
+    return clienteRepository.save(nuevo);
+});
+
+    // Validar si ya está inscrito
+        boolean yaInscrito = inscripcionRepository.existsByClienteAndClaseNivel(cliente, claseNivel);
     if (yaInscrito) {
         throw new RuntimeException("Ya inscrito en esta clase");
     }
-
-    // Crear cliente
-    Cliente cliente = new Cliente();
-    cliente.setNombres(dto.getNombres());
-    cliente.setApellidos(dto.getApellidos());
-    cliente.setCorreo(dto.getCorreo());
-    cliente.setDireccion(dto.getDireccion());
-    cliente.setDni(dto.getDni());
-    cliente = clienteRepository.save(cliente);
 
     // Crear inscripción
     Inscripcion inscripcion = new Inscripcion();

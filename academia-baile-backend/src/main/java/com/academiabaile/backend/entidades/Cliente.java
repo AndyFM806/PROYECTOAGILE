@@ -3,7 +3,6 @@ package com.academiabaile.backend.entidades;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 @Entity
 @Getter
 @Setter
@@ -14,13 +13,8 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "clase_nivel_id")
-    private ClaseNivel claseNivel;
-
     @Column(name = "anotacion", columnDefinition = "TEXT")
     private String anotacion;
-
 
     @Column(name = "nombres")
     private String nombres;
@@ -37,19 +31,5 @@ public class Cliente {
     @Column(name = "dni", nullable = false, unique = true)
     private String dni;
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public void setDni(String dni) {
-        this.dni = dni;
-    }
-    public void setAnotacion(String anotacion) {
-        this.anotacion = anotacion;
-    }
-    }
-
+    // No más relación directa con claseNivel
+}
