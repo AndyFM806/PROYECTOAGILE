@@ -10,16 +10,15 @@ public class WebConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
                         .allowedOrigins(
                             "https://timbatumbao-front.onrender.com",
-                            "http://localhost:5500"  // <-- este es el frontend local (VSCode)
+                            "http://localhost:5500"
                         )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") // 👈 AÑADIDO
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
