@@ -1,21 +1,20 @@
 package com.academiabaile.backend.entidades;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "inscripcion")
+@Data
 public class Inscripcion {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -30,49 +29,23 @@ public class Inscripcion {
     @JoinColumn(name = "clase_nivel_id")
     private ClaseNivel claseNivel;
 
-    public String getComprobanteUrl() {
-        return comprobanteUrl;
-    }
-
-    public void setComprobanteUrl(String comprobanteUrl) {
-        this.comprobanteUrl = comprobanteUrl;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    public ClaseNivel getClaseNivel() {
-        return claseNivel;
-    }
-
-    public void setClaseNivel(ClaseNivel claseNivel) {
-        this.claseNivel = claseNivel;
-    }
-    public Integer getId() {
-        return id;
-    }
     @Column(name = "fecha_inscripcion", updatable = false)
     private LocalDateTime fechaInscripcion;
 
     @PrePersist
     protected void onCreate() {
-    this.fechaInscripcion = LocalDateTime.now();
-}
+        this.fechaInscripcion = LocalDateTime.now();
+    }
+
     @Column(name = "comprobante_url")
     private String comprobanteUrl;
 
-    
+    @ManyToOne
+    private NotaCredito notaCredito;
+
+    private Double montoPendiente;
+    public void setFechaInscripcion(LocalDateTime fechaInscripcion) {
+    this.fechaInscripcion = fechaInscripcion;
+}
+
 }

@@ -1,5 +1,7 @@
 package com.academiabaile.backend.entidades;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,19 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClaseNivel {
-
-    @Column(nullable = false)
-    private int aforo;
-
-    public int getAforo() {
-        return aforo;
-    }
-
-    public void setAforo(int aforo) {
-        this.aforo = aforo;
-    }
-    
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,47 +27,19 @@ public class ClaseNivel {
     @JoinColumn(name = "horario_id")
     private Horario horario;
 
+    @Column(nullable = false)
+    private int aforo;
+
     private Double precio;
 
-    public Integer getId() {
-        return id;
-    }
+    @Column(nullable = false)
+    private String estado;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    @Column(name = "motivo_cancelacion")
+    private String motivoCancelacion;
+    @Column(name = "fecha_cierre")
+    private LocalDate fechaCierre;
 
-    public Clase getClase() {
-        return clase;
-    }
-
-    public void setClase(Clase clase) {
-        this.clase = clase;
-    }
-
-    public Nivel getNivel() {
-        return nivel;
-    }
-
-    public void setNivel(Nivel nivel) {
-        this.nivel = nivel;
-    }
-
-    public Horario getHorario() {
-        return horario;
-    }
-
-    public void setHorario(Horario horario) {
-        this.horario = horario;
-    }
-
-    public Double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(Double precio) {
-        this.precio = precio;
-    }
 }
 
 

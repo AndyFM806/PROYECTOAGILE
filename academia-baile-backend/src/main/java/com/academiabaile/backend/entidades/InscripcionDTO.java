@@ -13,7 +13,7 @@ public class InscripcionDTO {
     private Integer claseNivelId;
     private String estado;
     private String metodoPago; // "comprobante" o "pasarela"
-
+    private String codigoNotaCredito;
 
     public InscripcionDTO() {}
 }

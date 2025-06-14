@@ -1,9 +1,12 @@
 package com.academiabaile.backend.service;
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 import com.academiabaile.backend.entidades.InscripcionDTO;
+import com.academiabaile.backend.entidades.NotaCredito;
 import com.academiabaile.backend.entidades.Cliente;
 import com.academiabaile.backend.entidades.Inscripcion;
 import com.academiabaile.backend.entidades.ClaseNivel;
@@ -23,7 +26,12 @@ public class InscripcionServiceImpl implements InscripcionService {
     @Autowired
     private InscripcionRepository inscripcionRepository;
 
-    
+    @Autowired
+    private NotaCreditoService notaCreditoService;
+
+    @Autowired
+    private EmailService emailService;
+
 @Override
 public Integer registrar(InscripcionDTO dto) {
     ClaseNivel claseNivel = claseNivelRepository.findById(dto.getClaseNivelId())
@@ -35,37 +43,87 @@ public Integer registrar(InscripcionDTO dto) {
         throw new RuntimeException("Clase llena");
     }
 
+    // Obtener o crear cliente
+    Cliente cliente = clienteRepository.findByDni(dto.getDni())
+        .orElseGet(() -> {
+            Cliente nuevo = new Cliente();
+            nuevo.setDni(dto.getDni());
+            nuevo.setNombres(dto.getNombres());
+            nuevo.setCorreo(dto.getCorreo());
+            return clienteRepository.save(nuevo);
+        });
 
-    Cliente cliente = clienteRepository.findByDni(dto.getDni()).orElseGet(() -> {
-    Cliente nuevo = new Cliente();
-    nuevo.setNombres(dto.getNombres());
-    nuevo.setApellidos(dto.getApellidos());
-    nuevo.setCorreo(dto.getCorreo());
-    nuevo.setDireccion(dto.getDireccion());
-    nuevo.setDni(dto.getDni());
-    return clienteRepository.save(nuevo);
-});
-
-    // Validar si ya está inscrito
-        boolean yaInscrito = inscripcionRepository.existsByClienteAndClaseNivel(cliente, claseNivel);
-    if (yaInscrito) {
-        throw new RuntimeException("Ya inscrito en esta clase");
+    if (inscripcionRepository.existsByClienteAndClaseNivel(cliente, claseNivel)) {
+        throw new RuntimeException("El cliente ya está inscrito en esta clase");
     }
 
-    // Crear inscripción
+    // Crear nueva inscripción
     Inscripcion inscripcion = new Inscripcion();
     inscripcion.setCliente(cliente);
     inscripcion.setClaseNivel(claseNivel);
-    inscripcion.setEstado("pendiente");
+    inscripcion.setFechaInscripcion(LocalDate.now().atStartOfDay());
 
-    if ("pasarela".equalsIgnoreCase(dto.getMetodoPago())) {
-        // Simulación de validación exitosa de pasarela (puedes reemplazar por lógica real)
+    // Lógica de nota de crédit
+if (dto.getCodigoNotaCredito() != null && !dto.getCodigoNotaCredito().isEmpty()) {
+    NotaCredito nota = notaCreditoService.validarNota(dto.getCodigoNotaCredito());
+
+    double precioClase = claseNivel.getPrecio();
+
+    if (nota.getValor() >= precioClase) {
+        // Nota cubre todo el precio
+        notaCreditoService.marcarComoUsada(nota); // esto marca y guarda
         inscripcion.setEstado("aprobada");
-    }
+        inscripcion.setNotaCredito(nota);
 
-    inscripcion = inscripcionRepository.save(inscripcion);
+        emailService.enviarCorreo(cliente.getCorreo(),
+            "Inscripción completada con nota de crédito",
+            "Tu inscripción a la clase " + claseNivel.getClase().getNombre() +
+            " fue completada usando el código: " + nota.getCodigo() +
+            ". No necesitas realizar ningún pago adicional.");
+    } else {
+        // Nota cubre parcialmente
+        double diferencia = precioClase - nota.getValor();
+        inscripcion.setEstado("pendiente_pago_diferencia");
+        inscripcion.setMontoPendiente(diferencia);
+        inscripcion.setNotaCredito(nota);
+    }
+} else {
+    // Sin nota de crédito → pago completo pendiente
+    inscripcion.setEstado("pendiente");
+}
+
+
+    inscripcionRepository.save(inscripcion);
     return inscripcion.getId();
 }
+    @Override
+    public void completarPagoDiferencia(Integer inscripcionId, String metodo, String comprobanteUrl) {
+        Inscripcion inscripcion = inscripcionRepository.findById(inscripcionId)
+            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
+        if (!"pendiente_pago_diferencia".equalsIgnoreCase(inscripcion.getEstado())) {
+            throw new RuntimeException("La inscripción no está pendiente de pago de diferencia");
+        }
+
+        if ("comprobante".equalsIgnoreCase(metodo)) {
+            inscripcion.setComprobanteUrl(comprobanteUrl);
+            inscripcion.setEstado("pendiente_aprobacion_comprobante");
+        } else if ("mercado_pago".equalsIgnoreCase(metodo)) {
+            inscripcion.setEstado("aprobada");
+            if (inscripcion.getNotaCredito() != null && !inscripcion.getNotaCredito().getUsada()) {
+                notaCreditoService.marcarComoUsada(inscripcion.getNotaCredito());
+            }
+
+            emailService.enviarCorreo(
+                inscripcion.getCliente().getCorreo(),
+                "Inscripción completada",
+                "Tu inscripción a la clase " + inscripcion.getClaseNivel().getClase().getNombre() +
+                " fue aprobada tras completar el pago de diferencia con Mercado Pago."
+            );
+        }
+
+        inscripcionRepository.save(inscripcion);
+    }
 
 
 }

@@ -14,5 +14,7 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     boolean existsByClienteAndClaseNivel(Cliente cliente, ClaseNivel claseNivel);
     List<Inscripcion> findByClaseNivel_IdInAndEstado(List<Integer> claseNivelIds, String estado);
     List<Inscripcion> findByClaseNivelIn(List<ClaseNivel> niveles);
+    List<Inscripcion> findByClaseNivel(ClaseNivel claseNivel);
+    List<Inscripcion> findByEstadoAndNotaCreditoIsNotNullAndMontoPendienteGreaterThan(String estado, Double montoMinimo);
 
 }

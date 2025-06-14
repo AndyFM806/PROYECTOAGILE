@@ -60,4 +60,5 @@ public class ClaseNivelController {
         claseNivelRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
 }

@@ -199,5 +199,26 @@ public ResponseEntity<?> listarTodas() {
     List<Inscripcion> lista = inscripcionRepository.findAll();
     return ResponseEntity.ok(lista);
 }
+@PostMapping("/completar-pago-diferencia")
+public ResponseEntity<?> completarPagoDiferencia(@RequestParam Integer id,
+                                                 @RequestParam String metodo,
+                                                 @RequestParam(required = false) String comprobanteUrl) {
+    try {
+        inscripcionService.completarPagoDiferencia(id, metodo, comprobanteUrl);
+        return ResponseEntity.ok().body("Pago completado");
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+
+    // En InscripcionController.java
+
+@GetMapping("/pendientes-diferencia")
+public ResponseEntity<?> listarPendientesDiferencia() {
+    List<Inscripcion> lista = inscripcionRepository
+        .findByEstadoAndNotaCreditoIsNotNullAndMontoPendienteGreaterThan("pendiente_pago_diferencia", 0.0);
+
+    return ResponseEntity.ok(lista);
+}
 
 }
