@@ -123,7 +123,11 @@ public class InscripcionController {
     @PostMapping("/generar-pago/{inscripcionId}")
     public ResponseEntity<?> generarPago(@PathVariable Integer inscripcionId) {
         Inscripcion insc = inscripcionRepository.findById(inscripcionId)
-            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+    .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
+    if ("aprobada".equalsIgnoreCase(insc.getEstado())) {
+        throw new RuntimeException("La inscripción ya fue aprobada y no requiere pago.");
+    }
 
         String nombreClase = insc.getClaseNivel().getClase().getNombre() + " - " + insc.getClaseNivel().getNivel().getNombre();
         double monto = insc.getEstado().equalsIgnoreCase("pendiente_pago_diferencia") && insc.getMontoPendiente() != null
@@ -134,7 +138,7 @@ public class InscripcionController {
             throw new RuntimeException("Monto inválido para generar pago.");
         }
 
-        String urlPago = mpService.crearPreferencia(monto, nombreClase, inscripcionId);
+        String urlPago = mpService.crearPreferencia(nombreClase, inscripcionId);
         return ResponseEntity.ok(urlPago);
     }
 

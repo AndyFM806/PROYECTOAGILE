@@ -25,8 +25,13 @@ public class PagoController {
     @PostMapping("/webhook")
     public ResponseEntity<?> recibirNotificacion(@RequestBody Map<String, Object> payload) {
         try {
+            String tipo = (String) payload.get("type");
+            if (!"payment".equals(tipo)) {
+                return ResponseEntity.ok("Evento no relacionado a pago. Ignorado.");
+            }
+
             Map<String, Object> data = (Map<String, Object>) payload.get("data");
-            String paymentId = data.get("id").toString(); // ID del pago
+            String paymentId = data.get("id").toString();
 
             boolean aprobado = mercadoPagoRestService.pagoEsAprobado(paymentId);
 
@@ -41,5 +46,6 @@ public class PagoController {
             return ResponseEntity.badRequest().body("Error");
         }
     }
+
 }
 

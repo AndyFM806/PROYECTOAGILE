@@ -19,13 +19,15 @@ public class MercadoPagoRestService {
 
     private final InscripcionRepository inscripcionRepository;
     private final AuditoriaService auditoriaService;
+    private final EmailService emailService;
 
     public MercadoPagoRestService(InscripcionRepository inscripcionRepository, AuditoriaService auditoriaService) {
         this.inscripcionRepository = inscripcionRepository;
         this.auditoriaService = auditoriaService;
+        this.emailService = new EmailService();
     }
 
-    public String crearPreferencia(Double precioOriginal, String nombreClase, Integer inscripcionId) {
+    public String crearPreferencia(String nombreClase, Integer inscripcionId){
         try {
             RestTemplate restTemplate = new RestTemplate();
 
@@ -71,17 +73,6 @@ public class MercadoPagoRestService {
                     "unit_price", montoFinal
             );
 
-            // Información del cliente (evita apellidos nulos)
-            Map<String, Object> payer = Map.of(
-                    "name", insc.getCliente().getNombres(),
-                    "surname", Optional.ofNullable(insc.getCliente().getApellidos()).orElse(""),
-                    "email", insc.getCliente().getCorreo(),
-                    "identification", Map.of(
-                            "type", "DNI",
-                            "number", insc.getCliente().getDni()
-                    )
-            );
-
             // Cuerpo completo
             Map<String, Object> body = new HashMap<>();
             body.put("items", List.of(item));
@@ -93,7 +84,6 @@ public class MercadoPagoRestService {
                     "failure", failureUrl,
                     "pending", pendingUrl
             ));
-            // body.put("payer", payer);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
             ResponseEntity<Map> response = restTemplate.postForEntity(
@@ -131,15 +121,29 @@ public class MercadoPagoRestService {
 
         String status = resp.getBody().get("status").toString();
         Map metadata = (Map) resp.getBody().get("metadata");
-        Integer inscripcionId = (Integer) metadata.get("inscripcion_id");
+        Integer inscripcionId = Integer.parseInt(metadata.get("inscripcion_id").toString());
+
 
         if ("approved".equals(status)) {
-            Inscripcion insc = inscripcionRepository.findById(inscripcionId).orElseThrow();
-            insc.setEstado("aprobada");
-            inscripcionRepository.save(insc);
-            auditoriaService.registrar("sistema", "PAGO_APROBADO", "Pago aprobado para inscripción ID " + inscripcionId);
-            return true;
-        }
+    Inscripcion insc = inscripcionRepository.findById(inscripcionId).orElseThrow();
+    insc.setEstado("aprobada");
+    inscripcionRepository.save(insc);
+
+    auditoriaService.registrar("sistema", "PAGO_APROBADO", "Pago aprobado para inscripción ID " + inscripcionId);
+
+    // Enviar correo de confirmación
+    emailService.enviarCorreo(
+        insc.getCliente().getCorreo(),
+        "Inscripción confirmada",
+        "¡Hola " + insc.getCliente().getNombres() + "!\n\n" +
+        "Tu inscripción a la clase " + insc.getClaseNivel().getClase().getNombre() +
+        " - " + insc.getClaseNivel().getNivel().getNombre() +
+        " ha sido aprobada exitosamente mediante Mercado Pago.\n\n¡Te esperamos!"
+    );
+
+    return true;
+}
+
 
         auditoriaService.registrar("sistema", "PAGO_RECHAZADO", "Pago rechazado. ID " + paymentId);
         return false;

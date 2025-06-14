@@ -31,7 +31,8 @@ public class InscripcionServiceImpl implements InscripcionService {
 
     @Autowired
     private EmailService emailService;
-
+    @Autowired
+    private AuditoriaService auditoriaService;
 @Override
 public Integer registrar(InscripcionDTO dto) {
     ClaseNivel claseNivel = claseNivelRepository.findById(dto.getClaseNivelId())
@@ -100,32 +101,41 @@ public Integer registrar(InscripcionDTO dto) {
 
     @Override
     public void completarPagoDiferencia(Integer inscripcionId, String metodo, String comprobanteUrl) {
-        Inscripcion inscripcion = inscripcionRepository.findById(inscripcionId)
-            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+    Inscripcion inscripcion = inscripcionRepository.findById(inscripcionId)
+        .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
 
-        if (!"pendiente_pago_diferencia".equalsIgnoreCase(inscripcion.getEstado())) {
-            throw new RuntimeException("La inscripción no está pendiente de pago de diferencia");
-        }
-
-        if ("comprobante".equalsIgnoreCase(metodo)) {
-            inscripcion.setComprobanteUrl(comprobanteUrl);
-            inscripcion.setEstado("pendiente_aprobacion_comprobante");
-        } else if ("mercado_pago".equalsIgnoreCase(metodo)) {
-            inscripcion.setEstado("aprobada");
-            if (inscripcion.getNotaCredito() != null && !inscripcion.getNotaCredito().getUsada()) {
-                notaCreditoService.marcarComoUsada(inscripcion.getNotaCredito());
-            }
-
-            emailService.enviarCorreo(
-                inscripcion.getCliente().getCorreo(),
-                "Inscripción completada",
-                "Tu inscripción a la clase " + inscripcion.getClaseNivel().getClase().getNombre() +
-                " fue aprobada tras completar el pago de diferencia con Mercado Pago."
-            );
-        }
-
-        inscripcionRepository.save(inscripcion);
+    if (!"pendiente_pago_diferencia".equalsIgnoreCase(inscripcion.getEstado())) {
+        throw new RuntimeException("La inscripción no está pendiente de pago de diferencia");
     }
+
+    if ("comprobante".equalsIgnoreCase(metodo)) {
+        inscripcion.setComprobanteUrl(comprobanteUrl);
+        inscripcion.setEstado("pendiente_aprobacion_comprobante");
+
+        auditoriaService.registrar("sistema", "PAGO_DIFERENCIA_COMPROBANTE",
+            "Pago de diferencia registrado con comprobante para inscripción ID " + inscripcionId);
+
+    } else if ("mercado_pago".equalsIgnoreCase(metodo)) {
+        inscripcion.setEstado("aprobada");
+
+        if (inscripcion.getNotaCredito() != null && !inscripcion.getNotaCredito().getUsada()) {
+            notaCreditoService.marcarComoUsada(inscripcion.getNotaCredito());
+        }
+
+        emailService.enviarCorreo(
+            inscripcion.getCliente().getCorreo(),
+            "Inscripción completada",
+            "Tu inscripción a la clase " + inscripcion.getClaseNivel().getClase().getNombre() +
+            " fue aprobada tras completar el pago de diferencia con Mercado Pago."
+        );
+
+        auditoriaService.registrar("sistema", "PAGO_DIFERENCIA_MERCADO_PAGO",
+            "Pago de diferencia completado con Mercado Pago para inscripción ID " + inscripcionId);
+    }
+
+    inscripcionRepository.save(inscripcion);
+}
+
 
 
 }
