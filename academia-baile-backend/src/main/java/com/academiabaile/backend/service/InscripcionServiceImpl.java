@@ -49,10 +49,12 @@ public Integer registrar(InscripcionDTO dto) {
             Cliente nuevo = new Cliente();
             nuevo.setDni(dto.getDni());
             nuevo.setNombres(dto.getNombres());
+            nuevo.setApellidos(dto.getApellidos()); // ✅ Agregado correctamente
             nuevo.setCorreo(dto.getCorreo());
             return clienteRepository.save(nuevo);
         });
 
+    // Verificar si ya está inscrito en esta clase
     if (inscripcionRepository.existsByClienteAndClaseNivel(cliente, claseNivel)) {
         throw new RuntimeException("El cliente ya está inscrito en esta clase");
     }
@@ -63,39 +65,39 @@ public Integer registrar(InscripcionDTO dto) {
     inscripcion.setClaseNivel(claseNivel);
     inscripcion.setFechaInscripcion(LocalDate.now().atStartOfDay());
 
-    // Lógica de nota de crédit
-if (dto.getCodigoNotaCredito() != null && !dto.getCodigoNotaCredito().isEmpty()) {
-    NotaCredito nota = notaCreditoService.validarNota(dto.getCodigoNotaCredito());
+    // Lógica con nota de crédito
+    if (dto.getCodigoNotaCredito() != null && !dto.getCodigoNotaCredito().isEmpty()) {
+        NotaCredito nota = notaCreditoService.validarNota(dto.getCodigoNotaCredito());
 
-    double precioClase = claseNivel.getPrecio();
+        double precioClase = claseNivel.getPrecio();
 
-    if (nota.getValor() >= precioClase) {
-        // Nota cubre todo el precio
-        notaCreditoService.marcarComoUsada(nota); // esto marca y guarda
-        inscripcion.setEstado("aprobada");
-        inscripcion.setNotaCredito(nota);
+        if (nota.getValor() >= precioClase) {
+            // Nota cubre todo el precio
+            notaCreditoService.marcarComoUsada(nota);
+            inscripcion.setEstado("aprobada");
+            inscripcion.setNotaCredito(nota);
 
-        emailService.enviarCorreo(cliente.getCorreo(),
-            "Inscripción completada con nota de crédito",
-            "Tu inscripción a la clase " + claseNivel.getClase().getNombre() +
-            " fue completada usando el código: " + nota.getCodigo() +
-            ". No necesitas realizar ningún pago adicional.");
+            emailService.enviarCorreo(cliente.getCorreo(),
+                "Inscripción completada con nota de crédito",
+                "Tu inscripción a la clase " + claseNivel.getClase().getNombre() +
+                " fue completada usando el código: " + nota.getCodigo() +
+                ". No necesitas realizar ningún pago adicional.");
+        } else {
+            // Nota cubre parcialmente
+            double diferencia = precioClase - nota.getValor();
+            inscripcion.setEstado("pendiente_pago_diferencia");
+            inscripcion.setMontoPendiente(diferencia);
+            inscripcion.setNotaCredito(nota);
+        }
     } else {
-        // Nota cubre parcialmente
-        double diferencia = precioClase - nota.getValor();
-        inscripcion.setEstado("pendiente_pago_diferencia");
-        inscripcion.setMontoPendiente(diferencia);
-        inscripcion.setNotaCredito(nota);
+        // Sin nota de crédito → pago completo pendiente
+        inscripcion.setEstado("pendiente");
     }
-} else {
-    // Sin nota de crédito → pago completo pendiente
-    inscripcion.setEstado("pendiente");
-}
-
 
     inscripcionRepository.save(inscripcion);
     return inscripcion.getId();
 }
+
     @Override
     public void completarPagoDiferencia(Integer inscripcionId, String metodo, String comprobanteUrl) {
         Inscripcion inscripcion = inscripcionRepository.findById(inscripcionId)
