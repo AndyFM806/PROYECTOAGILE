@@ -160,4 +160,10 @@ public class InscripcionController {
 
         return ResponseEntity.ok(lista);
     }
+    @GetMapping
+public ResponseEntity<?> listarTodas() {
+    List<Inscripcion> lista = inscripcionRepository.findAll();
+    return ResponseEntity.ok(lista);
+}
+
 }
