@@ -46,6 +46,22 @@ public class PagoController {
             return ResponseEntity.badRequest().body("Error");
         }
     }
+    @GetMapping("/verificar/{paymentId}")
+public ResponseEntity<?> verificarPago(@PathVariable String paymentId) {
+    try {
+        boolean aprobado = mercadoPagoRestService.pagoEsAprobado(paymentId);
+
+        if (aprobado) {
+            return ResponseEntity.ok("Pago aprobado correctamente");
+        } else {
+            return ResponseEntity.ok("Pago rechazado o pendiente");
+        }
+
+    } catch (Exception e) {
+        auditoriaService.registrar("sistema", "ERROR_VERIFICAR_PAGO", "Error al verificar pago manual: " + e.getMessage());
+        return ResponseEntity.status(500).body("Error al verificar el pago");
+    }
+}
 
 }
 

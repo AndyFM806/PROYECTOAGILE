@@ -138,7 +138,7 @@ public class InscripcionController {
             throw new RuntimeException("Monto inválido para generar pago.");
         }
 
-        String urlPago = mpService.crearPreferencia(nombreClase, inscripcionId);
+        String urlPago = mpService.crearPreferencia(monto,nombreClase, inscripcionId);
         return ResponseEntity.ok(urlPago);
     }
 
