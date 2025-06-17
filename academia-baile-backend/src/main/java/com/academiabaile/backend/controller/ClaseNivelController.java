@@ -100,6 +100,7 @@ public class ClaseNivelController {
             existente.setPrecio(dto.getPrecio());
             existente.setAforo(dto.getAforo());
             existente.setEstado(dto.getEstado());
+            existente.setFechaCierre(dto.getFechaCierre());
 
             ClaseNivel actualizada = claseNivelRepository.save(existente);
 
