@@ -39,8 +39,8 @@ public class ClaseNivel {
     private String motivoCancelacion;
     @Column(name = "fecha_cierre")
     private LocalDate fechaCierre;
-
-}
+    
+    }
 
 
 

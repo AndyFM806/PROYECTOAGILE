@@ -6,14 +6,20 @@ public class ClaseNivelDTO {
     private String hora;
     private Double precio;
     private int aforo;
+    private String estado; // Nuevo campo
 
-
-    public ClaseNivelDTO(String nivel, String dias, String hora, Double precio, int aforo) {
+    public ClaseNivelDTO(String nivel, String dias, String hora, Double precio, int aforo, String estado) {
         this.nivel = nivel;
         this.dias = dias;
         this.hora = hora;
         this.precio = precio;
         this.aforo = aforo;
+        this.estado = estado;
+    }
+
+    // Constructor anterior para compatibilidad
+    public ClaseNivelDTO(String nivel, String dias, String hora, Double precio, int aforo) {
+        this(nivel, dias, hora, precio, aforo, null);
     }
 
     public String getNivel() {
@@ -54,5 +60,13 @@ public class ClaseNivelDTO {
 
     public void setAforo(int aforo) {
         this.aforo = aforo;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

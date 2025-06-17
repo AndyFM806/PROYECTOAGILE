@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 
 import com.academiabaile.backend.entidades.InscripcionDTO;
+import com.academiabaile.backend.entidades.MovimientoClienteDTO;
 import com.academiabaile.backend.entidades.NotaCredito;
 import com.academiabaile.backend.entidades.Cliente;
 import com.academiabaile.backend.entidades.Inscripcion;
@@ -136,6 +137,98 @@ public Integer registrar(InscripcionDTO dto) {
     inscripcionRepository.save(inscripcion);
 }
 
+    @Override
+public Integer registrarManual(InscripcionDTO dto) {
+    ClaseNivel claseNivel = claseNivelRepository.findById(dto.getClaseNivelId())
+        .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada"));
 
+    int inscritos = inscripcionRepository.countByClaseNivelAndEstado(claseNivel, "aprobada");
+    if (inscritos >= claseNivel.getAforo()) {
+        throw new RuntimeException("La clase está llena");
+    }
+
+    Cliente cliente = clienteRepository.findByDni(dto.getDni())
+        .orElseGet(() -> {
+            Cliente nuevo = new Cliente();
+            nuevo.setDni(dto.getDni());
+            nuevo.setNombres(dto.getNombres());
+            nuevo.setApellidos(dto.getApellidos());
+            nuevo.setCorreo(dto.getCorreo());
+            return clienteRepository.save(nuevo);
+        });
+
+    if (inscripcionRepository.existsByClienteAndClaseNivel(cliente, claseNivel)) {
+        throw new RuntimeException("El cliente ya está inscrito en esta clase");
+    }
+
+    Inscripcion inscripcion = new Inscripcion();
+    inscripcion.setCliente(cliente);
+    inscripcion.setClaseNivel(claseNivel);
+    inscripcion.setFechaInscripcion(LocalDate.now().atStartOfDay());
+    inscripcion.setEstado("aprobada");
+
+    inscripcionRepository.save(inscripcion);
+
+    emailService.enviarCorreo(
+        cliente.getCorreo(),
+        "Inscripción manual confirmada",
+        "Has sido inscrito manualmente a la clase: " + claseNivel.getClase().getNombre() +
+        " en el nivel " + claseNivel.getNivel().getNombre() + ". ¡Te esperamos!");
+
+    auditoriaService.registrar("admin", "INSCRIPCION_MANUAL",
+        "Inscripción manual del cliente " + cliente.getDni() + " en claseNivel ID " + claseNivel.getId());
+
+    return inscripcion.getId();
+}
+
+@Override
+public void moverCliente(MovimientoClienteDTO dto) {
+    Cliente cliente = clienteRepository.findByDni(dto.getDni())
+        .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+    ClaseNivel origen = claseNivelRepository.findById(dto.getClaseOrigenId())
+        .orElseThrow(() -> new RuntimeException("Clase origen no encontrada"));
+
+    ClaseNivel destino = claseNivelRepository.findById(dto.getClaseDestinoId())
+        .orElseThrow(() -> new RuntimeException("Clase destino no encontrada"));
+
+    // Buscar inscripción actual
+    Inscripcion inscripcionActual = inscripcionRepository.findByClienteAndClaseNivel(cliente, origen);
+    if (inscripcionActual == null) {
+        throw new RuntimeException("El cliente no está inscrito en la clase origen");
+    }
+
+    if (inscripcionRepository.existsByClienteAndClaseNivel(cliente, destino)) {
+        throw new RuntimeException("El cliente ya está inscrito en la clase destino");
+    }
+
+    int inscritosDestino = inscripcionRepository.countByClaseNivelAndEstado(destino, "aprobada");
+    if (inscritosDestino >= destino.getAforo()) {
+        throw new RuntimeException("La clase destino está llena");
+    }
+
+    // Cancelar inscripción anterior
+    inscripcionActual.setEstado("movida");
+    inscripcionRepository.save(inscripcionActual);
+
+    // Crear nueva inscripción
+    Inscripcion nuevaInscripcion = new Inscripcion();
+    nuevaInscripcion.setCliente(cliente);
+    nuevaInscripcion.setClaseNivel(destino);
+    nuevaInscripcion.setFechaInscripcion(LocalDate.now().atStartOfDay());
+    nuevaInscripcion.setEstado("aprobada");
+
+    inscripcionRepository.save(nuevaInscripcion);
+
+    emailService.enviarCorreo(
+        cliente.getCorreo(),
+        "Has sido reubicado de clase",
+        "Tu inscripción ha sido actualizada. Ahora estás inscrito en la clase " +
+        destino.getClase().getNombre() + " - Nivel: " + destino.getNivel().getNombre());
+
+    auditoriaService.registrar("admin", "CLIENTE_MOVIDO",
+        "El cliente " + cliente.getDni() + " fue movido de claseNivel " +
+        origen.getId() + " a claseNivel " + destino.getId());
+}
 
 }

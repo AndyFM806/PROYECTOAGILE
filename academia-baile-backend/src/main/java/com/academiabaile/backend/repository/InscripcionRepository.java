@@ -16,5 +16,6 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     List<Inscripcion> findByClaseNivelIn(List<ClaseNivel> niveles);
     List<Inscripcion> findByClaseNivel(ClaseNivel claseNivel);
     List<Inscripcion> findByEstadoAndNotaCreditoIsNotNullAndMontoPendienteGreaterThan(String estado, Double montoMinimo);
-
+    Inscripcion findByClienteAndClaseNivel(Cliente cliente, ClaseNivel claseNivel);
+    List<Inscripcion> findByClaseNivelAndEstado(ClaseNivel claseNivel, String estado);
 }

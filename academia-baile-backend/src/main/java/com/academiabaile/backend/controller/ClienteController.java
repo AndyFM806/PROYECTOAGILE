@@ -1,6 +1,7 @@
 package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.entidades.Cliente;
+import com.academiabaile.backend.entidades.ClienteDTO;
 import com.academiabaile.backend.service.ClienteService;
 import com.academiabaile.backend.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class ClienteController {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private com.academiabaile.backend.service.AuditoriaService auditoriaService;
 
     // ✅ Registro manual de cliente (sin claseNivel, ya no se usa directamente)
     @PostMapping
@@ -59,4 +63,25 @@ public class ClienteController {
         clienteRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
+    // ✅ Editar datos generales de un cliente
+@PutMapping("/{id}")
+public ResponseEntity<?> editarCliente(@PathVariable Integer id, @RequestBody ClienteDTO dto) {
+    try {
+        Cliente cliente = clienteService.findById(id);
+        cliente.setNombres(dto.getNombres());
+        cliente.setApellidos(dto.getApellidos());
+        cliente.setCorreo(dto.getCorreo());
+        cliente.setDireccion(dto.getDireccion());
+
+        Cliente actualizado = clienteService.guardarCliente(cliente);
+
+        auditoriaService.registrar("admin", "CLIENTE_EDITADO", 
+            "Se editaron los datos del cliente con ID " + id);
+
+        return ResponseEntity.ok(actualizado);
+    } catch (Exception e) {
+        return ResponseEntity.status(404).body("Cliente no encontrado");
+    }
+}
+
 }

@@ -8,4 +8,5 @@ public interface NotaCreditoService {
     NotaCredito generarNotaCredito(Cliente cliente, Double valor, ClaseNivel claseCancelada);
     void marcarComoUsada(NotaCredito notaCredito);
     public NotaCredito validarNota(String codigo);
+    NotaCredito crearNotaCreditoNueva(Cliente cliente, Double valor, java.time.LocalDate fechaEmision, java.time.LocalDate fechaExpiracion);
 }

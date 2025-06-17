@@ -5,6 +5,7 @@ import com.academiabaile.backend.repository.InscripcionRepository;
 import com.academiabaile.backend.service.*;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -181,4 +182,24 @@ public class InscripcionController {
     public ResponseEntity<?> listarTodas() {
         return ResponseEntity.ok(inscripcionRepository.findAll());
     }
+
+    @PostMapping("/manual")
+    public ResponseEntity<?> inscribirManual(@RequestBody InscripcionDTO dto) {
+        try {
+            Integer id = inscripcionService.registrarManual(dto);
+            return ResponseEntity.ok(Map.of("inscripcionId", id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PostMapping("/mover")
+public ResponseEntity<?> moverCliente(@RequestBody MovimientoClienteDTO dto) {
+    try {
+        inscripcionService.moverCliente(dto);
+        return ResponseEntity.ok("Cliente movido correctamente");
+    } catch (RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+
 }

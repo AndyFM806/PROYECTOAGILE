@@ -48,4 +48,16 @@ public NotaCredito validarNota(String codigo) {
 
     return nota;
 }
+    @Override
+    public NotaCredito crearNotaCreditoNueva(Cliente cliente, Double valor, LocalDate fechaEmision, LocalDate fechaExpiracion) {
+        NotaCredito nota = new NotaCredito();
+        nota.setCliente(cliente);
+        nota.setValor(valor);
+        nota.setFechaEmision(fechaEmision);
+        nota.setFechaExpiracion(fechaExpiracion);
+        nota.setCodigo(UUID.randomUUID().toString().substring(0, 10));
+        return notaCreditoRepository.save(nota);
+    }
+
+    
 }

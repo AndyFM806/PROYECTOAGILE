@@ -1,8 +1,12 @@
 package com.academiabaile.backend.service;
 
+import com.academiabaile.backend.entidades.Clase;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClaseNivelDTO;
+import com.academiabaile.backend.entidades.CrearClaseNivelDTO;
+import com.academiabaile.backend.entidades.Horario;
 import com.academiabaile.backend.entidades.Inscripcion;
+import com.academiabaile.backend.entidades.Nivel;
 import com.academiabaile.backend.entidades.NotaCredito;
 import com.academiabaile.backend.repository.ClaseNivelRepository;
 import com.academiabaile.backend.repository.InscripcionRepository;
@@ -11,9 +15,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.academiabaile.backend.repository.ClaseRepository;
+import com.academiabaile.backend.repository.NivelRepository;
+
+import jakarta.transaction.Transactional;
+
+import com.academiabaile.backend.repository.HorarioRepository;
 
 @Service
 public class ClaseNivelServiceImpl implements ClaseNivelService {
+
+    @Autowired
+    private ClaseRepository claseRepository;
+
+    @Autowired
+    private NivelRepository nivelRepository;
+
+    @Autowired
+    private HorarioRepository horarioRepository;
+
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     @Autowired
     private ClaseNivelRepository claseNivelRepository;
@@ -46,6 +68,7 @@ public class ClaseNivelServiceImpl implements ClaseNivelService {
 
     @Autowired
     private EmailService emailService;
+    
 
     @Override
 public void cerrarClaseSiNoLlegaAlMinimo(ClaseNivel claseNivel) {
@@ -75,6 +98,69 @@ public void cerrarClaseSiNoLlegaAlMinimo(ClaseNivel claseNivel) {
         }
     }
 }
+@Override
+public ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto) {
+    Clase clase = claseRepository.findById(dto.getClaseId())
+        .orElseThrow(() -> new RuntimeException("Clase no encontrada"));
+    Nivel nivel = nivelRepository.findById(dto.getNivelId())
+        .orElseThrow(() -> new RuntimeException("Nivel no encontrado"));
+    Horario horario = horarioRepository.findById(dto.getHorarioId())
+        .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+
+    ClaseNivel claseNivel = new ClaseNivel();
+    claseNivel.setClase(clase);
+    claseNivel.setNivel(nivel);
+    claseNivel.setHorario(horario);
+    claseNivel.setPrecio(dto.getPrecio());
+    claseNivel.setAforo(dto.getAforo());
+    claseNivel.setEstado("abierta");
+    if (dto.getFechaCierre() != null) {
+    claseNivel.setFechaCierre(dto.getFechaCierre());
+}
+
+    claseNivelRepository.save(claseNivel);
+
+    auditoriaService.registrar("admin", "CLASE_NIVEL_CREADA",
+        "Se creó clase nivel para clase ID " + dto.getClaseId());
+
+    return claseNivel;
+}
+
+    @Override
+public void cerrarClaseNivel(Integer id) {
+    ClaseNivel claseNivel = claseNivelRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada"));
+
+    if ("cerrada".equalsIgnoreCase(claseNivel.getEstado())) {
+        throw new RuntimeException("Clase ya cerrada");
+    }
+
+    claseNivel.setEstado("cerrada");
+    claseNivelRepository.save(claseNivel);
+
+    List<Inscripcion> inscripciones = inscripcionRepository
+        .findByClaseNivelAndEstado(claseNivel, "aprobada");
+
+    for (Inscripcion insc : inscripciones) {
+        NotaCredito nota = notaCreditoService.crearNotaCreditoNueva(
+            insc.getCliente(),
+            claseNivel.getPrecio(),
+            java.time.LocalDate.now(),
+            java.time.LocalDate.now().plusDays(1)
+        );
+        emailService.enviarCorreo(
+            insc.getCliente().getCorreo(),
+            "Clase cancelada",
+            "La clase fue cancelada. Puedes usar el código " + nota.getCodigo() +
+            " por S/ " + nota.getValor() + " hasta el " + nota.getFechaExpiracion() + ".");
+        auditoriaService.registrar("sistema", "CLASE_CANCELADA_CLIENTE",
+            "Se notificó a cliente ID " + insc.getCliente().getId() + " por cierre de clase");
+    }
+
+    auditoriaService.registrar("admin", "CLASE_NIVEL_CERRADA",
+        "ClaseNivel ID " + id + " fue cerrada y notificados los clientes");
+}
+
 
 }
 
