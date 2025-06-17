@@ -143,5 +143,5 @@ public List<Clase> obtenerClasesConNivelesAbiertos() {
 
     return new ArrayList<>(clases);
 }
-
+    
 }

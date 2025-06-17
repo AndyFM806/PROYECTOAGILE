@@ -13,5 +13,5 @@ public interface ClaseNivelService {
         ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto);
         public void reabrirClaseNivel(Integer id);
         List<ClaseNivel> findByClaseIdAndEstado(Integer claseId, String estado);
-
+        
 }
