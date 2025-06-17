@@ -26,7 +26,7 @@ public class NotaCredito {
     private LocalDate fechaExpiracion;
 
     @ManyToOne
-    @JoinColumn(name = "clase_cancelada_id")
+    @JoinColumn(name = "clase_cancelada_id",nullable = true)
     private ClaseNivel claseCancelada;
 
     private Boolean usada = false;

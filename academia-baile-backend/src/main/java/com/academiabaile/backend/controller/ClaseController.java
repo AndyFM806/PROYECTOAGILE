@@ -1,6 +1,7 @@
 package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.entidades.Clase;
+import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClaseNivelDTO;
 import com.academiabaile.backend.entidades.ClienteDTO;
 import com.academiabaile.backend.entidades.NivelResumenDTO;
@@ -44,9 +45,10 @@ public class ClaseController {
 
     // ✅ Obtener niveles por clase
     @GetMapping("/{id}/niveles")
-    public ResponseEntity<List<ClaseNivelDTO>> obtenerNivelesPorClase(@PathVariable Integer id) {
-        return ResponseEntity.ok(claseNivelService.obtenerNivelesPorClase(id));
-    }
+public ResponseEntity<List<ClaseNivel>> obtenerNivelesAbiertosPorClase(@PathVariable Integer id) {
+    List<ClaseNivel> abiertos = claseNivelService.findByClaseIdAndEstado(id, "abierta");
+    return ResponseEntity.ok(abiertos);
+}
 
     // ✅ Obtener resumen de niveles por clase
     @GetMapping("/{id}/niveles-resumen")

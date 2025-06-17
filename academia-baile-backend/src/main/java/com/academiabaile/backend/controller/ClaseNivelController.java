@@ -16,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clase-nivel")
@@ -117,4 +120,28 @@ public class ClaseNivelController {
         auditoriaService.registrar("ADMIN", "ELIMINACIÓN", "Se eliminó clase nivel ID " + id);
         return ResponseEntity.ok().build();
     }
+    @PatchMapping("/{id}/reabrir")
+public ResponseEntity<?> reabrirClase(@PathVariable Integer id) {
+    try {
+        claseNivelService.reabrirClaseNivel(id);
+        return ResponseEntity.ok("Clase reabierta correctamente");
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body("Error al reabrir clase: " + e.getMessage());
+    }
+}
+@GetMapping("/abiertas")
+public List<ClaseNivel> listarSoloAbiertas() {
+    return claseNivelRepository.findByEstado("abierta");
+}
+@GetMapping("/clases-con-niveles-abiertos")
+public List<Clase> obtenerClasesConNivelesAbiertos() {
+    List<ClaseNivel> abiertos = claseNivelRepository.findByEstado("abierta");
+
+    Set<Clase> clases = abiertos.stream()
+        .map(ClaseNivel::getClase)
+        .collect(Collectors.toSet());
+
+    return new ArrayList<>(clases);
+}
+
 }

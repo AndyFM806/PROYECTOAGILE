@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 import com.academiabaile.backend.repository.ClaseRepository;
 import com.academiabaile.backend.repository.NivelRepository;
 
-import jakarta.transaction.Transactional;
-
 import com.academiabaile.backend.repository.HorarioRepository;
 
 @Service
@@ -142,12 +140,12 @@ public void cerrarClaseNivel(Integer id) {
         .findByClaseNivelAndEstado(claseNivel, "aprobada");
 
     for (Inscripcion insc : inscripciones) {
-        NotaCredito nota = notaCreditoService.crearNotaCreditoNueva(
-            insc.getCliente(),
-            claseNivel.getPrecio(),
-            java.time.LocalDate.now(),
-            java.time.LocalDate.now().plusDays(1)
-        );
+        NotaCredito nota = notaCreditoService.generarNotaCredito(
+        insc.getCliente(),
+        claseNivel.getPrecio(),
+        claseNivel
+    );
+
         emailService.enviarCorreo(
             insc.getCliente().getCorreo(),
             "Clase cancelada",
@@ -161,6 +159,27 @@ public void cerrarClaseNivel(Integer id) {
         "ClaseNivel ID " + id + " fue cerrada y notificados los clientes");
 }
 
+@Override
+public void reabrirClaseNivel(Integer id) {
+    ClaseNivel claseNivel = claseNivelRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada"));
 
+    if (!"cerrada".equalsIgnoreCase(claseNivel.getEstado())) {
+        throw new RuntimeException("Solo se pueden reabrir clases que estén en estado 'cerrada'");
+    }
+
+    claseNivel.setEstado("abierta");
+    claseNivel.setMotivoCancelacion(null);
+    claseNivel.setFechaCierre(null); // opcional: si quieres limpiar la fecha
+    claseNivelRepository.save(claseNivel);
+
+    auditoriaService.registrar("admin", "CLASE_REABIERTA", "Se reabrió la clase nivel ID " + id);
+}
+@Override
+public List<ClaseNivel> findByClaseIdAndEstado(Integer claseId, String estado) {
+    return claseNivelRepository.findByClaseIdAndEstado(claseId, estado);
+}
+
+    
 }
 

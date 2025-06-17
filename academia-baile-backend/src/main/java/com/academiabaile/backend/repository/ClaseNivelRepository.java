@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface ClaseNivelRepository extends JpaRepository<ClaseNivel, Integer> {
     List<ClaseNivel> findByClaseId(Integer claseId);
-    List<ClaseNivel> findByFechaCierreAndEstado(LocalDate fechaCierre, String estado);
+    List<ClaseNivel> findByClaseIdAndEstado(Integer claseId, String estado);
+    List<ClaseNivel> findByEstado(String estado);
 
 }
 

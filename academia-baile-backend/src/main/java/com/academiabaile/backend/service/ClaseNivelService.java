@@ -11,5 +11,7 @@ public interface ClaseNivelService {
         void cerrarClaseSiNoLlegaAlMinimo(ClaseNivel claseNivel);
         void cerrarClaseNivel(Integer id);
         ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto);
+        public void reabrirClaseNivel(Integer id);
+        List<ClaseNivel> findByClaseIdAndEstado(Integer claseId, String estado);
 
 }
