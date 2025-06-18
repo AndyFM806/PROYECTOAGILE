@@ -40,4 +40,9 @@ public class SolicitudCambioServiceImpl implements SolicitudCambioService {
         solicitud.setEstado(aprobar ? EstadoSolicitud.ATENDIDA : EstadoSolicitud.RECHAZADA);
         return solicitudCambioRepository.save(solicitud);
     }
+    @Override
+    public List<SolicitudCambio> listarTodas() {
+    return solicitudCambioRepository.findAll();
+}
+
 }

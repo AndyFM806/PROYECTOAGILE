@@ -8,4 +8,6 @@ public interface SolicitudCambioService {
     List<SolicitudCambio> listarPendientes();
     List<SolicitudCambio> listarPorUsuario(Long usuarioId);
     SolicitudCambio atenderSolicitud(Long id, String respuesta, boolean aprobar);
+    List<SolicitudCambio> listarTodas();
+
 }

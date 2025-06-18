@@ -37,4 +37,9 @@ public class SolicitudCambioController {
     ) {
         return solicitudCambioService.atenderSolicitud(id, respuesta, aprobar);
     }
+    @GetMapping
+    public List<SolicitudCambio> listarTodas() {
+    return solicitudCambioService.listarTodas();
+}
+
 }
