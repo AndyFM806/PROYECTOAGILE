@@ -26,4 +26,7 @@ public interface AlumnoService {
     void moverAlumnoDeClase(Integer clienteId, Integer origenClaseNivelId, Integer destinoClaseNivelId);
     
     public List<ClaseNivel> listarClasesNoInscritas(Integer clienteId);
+    
+    List<ClienteDTO> listarAlumnosPorClaseNivel(Integer claseNivelId);
+
 }

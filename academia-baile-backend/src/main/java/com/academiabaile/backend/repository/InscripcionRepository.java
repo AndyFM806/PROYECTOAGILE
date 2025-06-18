@@ -21,5 +21,5 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     List<Inscripcion> findByClienteId(Integer clienteId);
     boolean existsByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
     java.util.Optional<Inscripcion> findByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
-    
+    List<Inscripcion> findByClaseNivelId(Integer claseNivelId);
 }

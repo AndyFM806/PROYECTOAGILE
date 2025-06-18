@@ -24,9 +24,6 @@ public class AlumnoServiceImpl implements AlumnoService {
     private ClaseNivelRepository claseNivelRepository;
 
     @Autowired
-    private NotaCreditoService notaCreditoService;
-
-    @Autowired
     private AuditoriaService auditoriaService;
 
     @Autowired
@@ -164,5 +161,21 @@ public void moverAlumnoDeClase(Integer clienteId, Integer origenClaseNivelId, In
                 .filter(cn -> !inscritas.contains(cn))
                 .collect(Collectors.toList());
 }
+    @Override
+    public List<ClienteDTO> listarAlumnosPorClaseNivel(Integer claseNivelId) {
+        List<Inscripcion> inscripciones = inscripcionRepository.findByClaseNivelId(claseNivelId);
+
+        return inscripciones.stream()
+                .map(insc -> {
+                    Cliente c = insc.getCliente();
+                    ClienteDTO dto = new ClienteDTO();
+                    dto.setId(c.getId());
+                    dto.setNombres(c.getNombres());
+                    dto.setApellidos(c.getApellidos());
+                    dto.setDni(c.getDni());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
 }
