@@ -38,4 +38,12 @@ public class UsuarioController {
     public Usuario obtenerPorNombre(@PathVariable String nombreUsuario) {
         return usuarioService.obtenerPorNombreUsuario(nombreUsuario);
     }
+    @Autowired
+    private com.academiabaile.backend.repository.UsuarioRepository usuarioRepository;
+
+    @GetMapping("/{id}")
+    public Usuario obtenerPorId(@PathVariable Long id) {
+        return usuarioRepository.findById(id).orElseThrow();
+    }
+
 }
