@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AlumnoServiceImpl implements AlumnoService {
@@ -154,6 +155,14 @@ public void moverAlumnoDeClase(Integer clienteId, Integer origenClaseNivelId, In
 
     auditoriaService.registrar("admin", "CAMBIO_CLASE_ALUMNO",
         "Alumno ID " + clienteId + " movido de claseNivel " + origenClaseNivelId + " a " + destinoClaseNivelId);
+}
+        @Override
+        public List<ClaseNivel> listarClasesNoInscritas(Integer clienteId) {
+        List<ClaseNivel> inscritas = listarClasesDeAlumno(clienteId);
+        List<ClaseNivel> todas = claseNivelRepository.findAll();
+        return todas.stream()
+                .filter(cn -> !inscritas.contains(cn))
+                .collect(Collectors.toList());
 }
 
 }

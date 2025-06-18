@@ -67,4 +67,9 @@ public class AlumnoController {
         NotaCredito nota = alumnoService.generarManualNotaCredito(clienteId, valor);
         return ResponseEntity.ok(nota);
     }
+    @GetMapping("/{id}/clases-disponibles")
+    public ResponseEntity<List<ClaseNivel>> listarClasesNoInscritas(@PathVariable Integer id) {
+    return ResponseEntity.ok(alumnoService.listarClasesNoInscritas(id));
+}
+
 }
