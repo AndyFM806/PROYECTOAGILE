@@ -13,8 +13,6 @@ import java.util.Map;
 @RequestMapping("/api/pagos")
 public class PagoController {
 
-    @Autowired
-    private InscripcionRepository inscripcionRepository;
 
     @Autowired
     private AuditoriaService auditoriaService;

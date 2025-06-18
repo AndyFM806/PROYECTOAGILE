@@ -1,35 +1,35 @@
-package com.academiabaile.backend.service;
+    package com.academiabaile.backend.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+    import com.cloudinary.Cloudinary;
+    import com.cloudinary.utils.ObjectUtils;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Map;
+    import java.io.IOException;
+    import java.util.Map;
 
-@Service
-public class AlmacenamientoServiceImpl implements AlmacenamientoService {
+    @Service
+    public class AlmacenamientoServiceImpl implements AlmacenamientoService {
 
-    @Autowired
-    private Cloudinary cloudinary;
+        @Autowired
+        private Cloudinary cloudinary;
 
-    @Override
-    public String guardar(MultipartFile archivo) {
-        try {
-            if (archivo.isEmpty()) {
-                throw new RuntimeException("Archivo vacío");
+        @Override
+        public String guardar(MultipartFile archivo) {
+            try {
+                if (archivo.isEmpty()) {
+                    throw new RuntimeException("Archivo vacío");
+                }
+
+                // Subir archivo a Cloudinary
+                Map<?, ?> resultado = cloudinary.uploader().upload(archivo.getBytes(), ObjectUtils.emptyMap());
+
+                // Retornar solo la URL segura
+                return resultado.get("secure_url").toString();
+
+            } catch (IOException e) {
+                throw new RuntimeException("Error al subir el archivo a Cloudinary: " + e.getMessage(), e);
             }
-
-            // Subir archivo a Cloudinary
-            Map<?, ?> resultado = cloudinary.uploader().upload(archivo.getBytes(), ObjectUtils.emptyMap());
-
-            // Retornar solo la URL segura
-            return resultado.get("secure_url").toString();
-
-        } catch (IOException e) {
-            throw new RuntimeException("Error al subir el archivo a Cloudinary: " + e.getMessage(), e);
         }
     }
-}

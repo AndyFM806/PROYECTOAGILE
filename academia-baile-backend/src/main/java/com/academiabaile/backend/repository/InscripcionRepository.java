@@ -18,4 +18,8 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     List<Inscripcion> findByEstadoAndNotaCreditoIsNotNullAndMontoPendienteGreaterThan(String estado, Double montoMinimo);
     Inscripcion findByClienteAndClaseNivel(Cliente cliente, ClaseNivel claseNivel);
     List<Inscripcion> findByClaseNivelAndEstado(ClaseNivel claseNivel, String estado);
+    List<Inscripcion> findByClienteId(Integer clienteId);
+    boolean existsByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
+    java.util.Optional<Inscripcion> findByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
+    
 }

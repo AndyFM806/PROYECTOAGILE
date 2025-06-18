@@ -2,7 +2,6 @@ package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.entidades.Clase;
 import com.academiabaile.backend.entidades.ClaseNivel;
-import com.academiabaile.backend.entidades.ClaseNivelDTO;
 import com.academiabaile.backend.entidades.ClienteDTO;
 import com.academiabaile.backend.entidades.NivelResumenDTO;
 import com.academiabaile.backend.repository.ClaseRepository;
