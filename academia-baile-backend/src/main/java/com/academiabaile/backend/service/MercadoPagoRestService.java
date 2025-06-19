@@ -110,13 +110,10 @@ public class MercadoPagoRestService {
             insc.setEstado("aprobada");
             inscripcionRepository.save(insc);
 
-            auditoriaService.registrar("sistema", "PAGO_APROBADO",
-                    "Pago aprobado para inscripción ID " + inscripcionId);
-            return true;
+        
+        return true;
         }
 
-        auditoriaService.registrar("sistema", "PAGO_RECHAZADO",
-                "Pago rechazado o pendiente. ID: " + paymentId);
         return false;
     }
 }

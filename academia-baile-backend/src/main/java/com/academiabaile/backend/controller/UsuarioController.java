@@ -1,5 +1,7 @@
 package com.academiabaile.backend.controller;
 
+import com.academiabaile.backend.config.UsuarioUtil;
+import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
+    @Autowired
+    private com.academiabaile.backend.repository.ModuloAccesoRepository moduloAccesoRepository;
+
+    @Autowired
+    private com.academiabaile.backend.service.AuditoriaService auditoriaService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -73,6 +80,14 @@ public class UsuarioController {
 
         // Enviar el correo
         emailService.enviarCorreo(admin.getCorreoRecuperacion(), "Recuperación de contraseña", mensaje);
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "RECUPERACION_CONTRASEÑA",
+            "Solicitud de recuperación de contraseña para usuario: " + admin.getNombreUsuario(),
+            modulo
+        );
+
 
         return "Se envió un código de recuperación al correo del administrador.";
     }
@@ -105,6 +120,14 @@ public String validarCodigoYActualizar(@RequestBody Map<String, String> datos) {
     admin.setCodigoRecuperacion(null); // eliminar código
 
     usuarioRepository.save(admin);
+    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
+    auditoriaService.registrar(
+        UsuarioUtil.obtenerUsuarioActual(),
+        "VALIDACION_CODIGO_RECUPERACION",
+        "Código de recuperación validado para usuario: " + admin.getNombreUsuario() ,
+        modulo
+    );
+
 
     return "Contraseña actualizada correctamente.";
 }

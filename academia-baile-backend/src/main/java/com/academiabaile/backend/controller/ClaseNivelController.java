@@ -43,9 +43,6 @@ public class ClaseNivelController {
     @Autowired
     private ClaseNivelService claseNivelService;
 
-    @Autowired
-    private AuditoriaService auditoriaService;
-
     // Listar todas las combinaciones clase-nivel
     @GetMapping
     public List<ClaseNivel> listarClaseNiveles() {
@@ -78,7 +75,6 @@ public class ClaseNivelController {
 
             ClaseNivel guardada = claseNivelRepository.save(nueva);
 
-            auditoriaService.registrar("ADMIN", "CREACIÓN", "Se creó una clase nivel: ID " + guardada.getId());
             return ResponseEntity.ok(guardada);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al crear ClaseNivel: " + e.getMessage());
@@ -106,7 +102,6 @@ public class ClaseNivelController {
 
             ClaseNivel actualizada = claseNivelRepository.save(existente);
 
-            auditoriaService.registrar("ADMIN", "MODIFICACIÓN", "Se modificó clase nivel ID " + id);
             return ResponseEntity.ok(actualizada);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al modificar ClaseNivel: " + e.getMessage());
@@ -120,7 +115,6 @@ public class ClaseNivelController {
             return ResponseEntity.notFound().build();
         }
         claseNivelRepository.deleteById(id);
-        auditoriaService.registrar("ADMIN", "ELIMINACIÓN", "Se eliminó clase nivel ID " + id);
         return ResponseEntity.ok().build();
     }
     @PatchMapping("/{id}/reabrir")

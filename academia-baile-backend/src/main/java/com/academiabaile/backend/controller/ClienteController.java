@@ -75,8 +75,6 @@ public ResponseEntity<?> editarCliente(@PathVariable Integer id, @RequestBody Cl
 
         Cliente actualizado = clienteService.guardarCliente(cliente);
 
-        auditoriaService.registrar("admin", "CLIENTE_EDITADO", 
-            "Se editaron los datos del cliente con ID " + id);
 
         return ResponseEntity.ok(actualizado);
     } catch (Exception e) {

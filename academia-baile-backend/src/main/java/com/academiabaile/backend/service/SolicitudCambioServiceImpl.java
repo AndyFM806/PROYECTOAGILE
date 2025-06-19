@@ -1,7 +1,10 @@
 package com.academiabaile.backend.service;
 
+import com.academiabaile.backend.config.UsuarioUtil;
+import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.SolicitudCambio;
 import com.academiabaile.backend.entidades.SolicitudCambio.EstadoSolicitud;
+import com.academiabaile.backend.repository.ModuloAccesoRepository;
 import com.academiabaile.backend.repository.SolicitudCambioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +18,28 @@ public class SolicitudCambioServiceImpl implements SolicitudCambioService {
     @Autowired
     private SolicitudCambioRepository solicitudCambioRepository;
 
+    @Autowired
+    private AuditoriaService auditoriaService;
+
+    @Autowired
+    private ModuloAccesoRepository moduloAccesoRepository;
+
     @Override
     public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
         solicitud.setEstado(EstadoSolicitud.PENDIENTE);
         solicitud.setFechaCreacion(LocalDateTime.now());
-        return solicitudCambioRepository.save(solicitud);
+        SolicitudCambio guardada = solicitudCambioRepository.save(solicitud);
+
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "SOLICITUD_CAMBIO_REGISTRADA",
+            "Solicitud de tipo " + solicitud.getTipoSolicitud() + " registrada por el usuario " +
+            solicitud.getUsuario().getNombreUsuario(),
+            modulo
+        );
+
+        return guardada;
     }
 
     @Override
@@ -38,11 +58,25 @@ public class SolicitudCambioServiceImpl implements SolicitudCambioService {
         solicitud.setRespuesta(respuesta);
         solicitud.setFechaRespuesta(LocalDateTime.now());
         solicitud.setEstado(aprobar ? EstadoSolicitud.ATENDIDA : EstadoSolicitud.RECHAZADA);
-        return solicitudCambioRepository.save(solicitud);
+        SolicitudCambio actualizada = solicitudCambioRepository.save(solicitud);
+
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
+        String tipo = aprobar ? "SOLICITUD_CAMBIO_APROBADA" : "SOLICITUD_CAMBIO_RECHAZADA";
+        String descripcion = "Solicitud ID " + id + " fue " + (aprobar ? "aprobada" : "rechazada") +
+                " por el admin. Respuesta: " + respuesta;
+
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            tipo,
+            descripcion,
+            modulo
+        );
+
+        return actualizada;
     }
+
     @Override
     public List<SolicitudCambio> listarTodas() {
-    return solicitudCambioRepository.findAll();
-}
-
+        return solicitudCambioRepository.findAll();
+    }
 }

@@ -6,17 +6,23 @@ import org.springframework.stereotype.Service;
 
 
 import com.academiabaile.backend.entidades.InscripcionDTO;
+import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.MovimientoClienteDTO;
 import com.academiabaile.backend.entidades.NotaCredito;
 import com.academiabaile.backend.entidades.Cliente;
 import com.academiabaile.backend.entidades.Inscripcion;
+import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.repository.ClienteRepository;
 import com.academiabaile.backend.repository.ClaseNivelRepository;
 import com.academiabaile.backend.repository.InscripcionRepository;
+import com.academiabaile.backend.repository.ModuloAccesoRepository;
 
     @Service
 public class InscripcionServiceImpl implements InscripcionService {
+
+    @Autowired
+    private ModuloAccesoRepository moduloAccesoRepository;
 
     @Autowired
     private ClienteRepository clienteRepository;
@@ -95,7 +101,21 @@ public Integer registrar(InscripcionDTO dto) {
         // Sin nota de crédito → pago completo pendiente
         inscripcion.setEstado("pendiente");
     }
+    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
+    String medio = dto.getCodigoNotaCredito() != null ? "Nota de crédito" : "Sin medio asignado";
+    String estado = inscripcion.getEstado();
+    String monto = estado.equals("aprobada") ? "S/ " + claseNivel.getPrecio()
+            : estado.equals("pendiente_pago_diferencia") ? "Pendiente: S/ " + inscripcion.getMontoPendiente()
+            : "Por confirmar";
 
+    auditoriaService.registrar(
+        UsuarioUtil.obtenerUsuarioActual(),
+        "REGISTRO_INSCRIPCION",
+        "Cliente " + cliente.getNombres() + " inscrito en " +
+        claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre() +
+        ". Estado: " + estado + ", Monto: " + monto + ", Medio: " + medio,
+        modulo
+    );
     inscripcionRepository.save(inscripcion);
     return inscripcion.getId();
 }
@@ -113,8 +133,16 @@ public Integer registrar(InscripcionDTO dto) {
         inscripcion.setComprobanteUrl(comprobanteUrl);
         inscripcion.setEstado("pendiente_aprobacion_comprobante");
 
-        auditoriaService.registrar("sistema", "PAGO_DIFERENCIA_COMPROBANTE",
-            "Pago de diferencia registrado con comprobante para inscripción ID " + inscripcionId);
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "PAGO_DIFERENCIA_COMPROBANTE",
+            "Pago con comprobante subido para inscripción ID " + inscripcionId +
+            ". Cliente: " + inscripcion.getCliente().getNombres() +
+            ", Monto pendiente: S/ " + inscripcion.getMontoPendiente(),
+            modulo
+        );
+
 
     } else if ("mercado_pago".equalsIgnoreCase(metodo)) {
         inscripcion.setEstado("aprobada");
@@ -130,8 +158,15 @@ public Integer registrar(InscripcionDTO dto) {
             " fue aprobada tras completar el pago de diferencia con Mercado Pago."
         );
 
-        auditoriaService.registrar("sistema", "PAGO_DIFERENCIA_MERCADO_PAGO",
-            "Pago de diferencia completado con Mercado Pago para inscripción ID " + inscripcionId);
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "PAGO_DIFERENCIA_MERCADO_PAGO",
+            "Pago completado vía Mercado Pago para inscripción ID " + inscripcionId +
+            ". Cliente: " + inscripcion.getCliente().getNombres(),
+            modulo
+        );
+
     }
 
     inscripcionRepository.save(inscripcion);
@@ -145,6 +180,7 @@ public Integer registrarManual(InscripcionDTO dto) {
     int inscritos = inscripcionRepository.countByClaseNivelAndEstado(claseNivel, "aprobada");
     if (inscritos >= claseNivel.getAforo()) {
         throw new RuntimeException("La clase está llena");
+        
     }
 
     Cliente cliente = clienteRepository.findByDni(dto.getDni())
@@ -175,8 +211,16 @@ public Integer registrarManual(InscripcionDTO dto) {
         "Has sido inscrito manualmente a la clase: " + claseNivel.getClase().getNombre() +
         " en el nivel " + claseNivel.getNivel().getNombre() + ". ¡Te esperamos!");
 
-    auditoriaService.registrar("admin", "INSCRIPCION_MANUAL",
-        "Inscripción manual del cliente " + cliente.getDni() + " en claseNivel ID " + claseNivel.getId());
+   ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
+    auditoriaService.registrar(
+        UsuarioUtil.obtenerUsuarioActual(),
+        "INSCRIPCION_MANUAL",
+        "Cliente " + cliente.getNombres() + " inscrito manualmente en clase " +
+        claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre() +
+        ". Precio: S/ " + claseNivel.getPrecio(),
+        modulo
+    );
+
 
     return inscripcion.getId();
 }
@@ -226,9 +270,14 @@ public void moverCliente(MovimientoClienteDTO dto) {
         "Tu inscripción ha sido actualizada. Ahora estás inscrito en la clase " +
         destino.getClase().getNombre() + " - Nivel: " + destino.getNivel().getNombre());
 
-    auditoriaService.registrar("admin", "CLIENTE_MOVIDO",
-        "El cliente " + cliente.getDni() + " fue movido de claseNivel " +
-        origen.getId() + " a claseNivel " + destino.getId());
-}
+    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
+    auditoriaService.registrar(
+        UsuarioUtil.obtenerUsuarioActual(),
+        "CAMBIO_CLASE_CLIENTE",
+        "Cliente " + cliente.getNombres() + " movido de claseNivel ID " +
+        origen.getId() + " a claseNivel ID " + destino.getId(),
+        modulo
+    );
 
+}
 }

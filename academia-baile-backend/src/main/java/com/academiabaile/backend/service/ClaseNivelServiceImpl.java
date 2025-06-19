@@ -1,15 +1,18 @@
 package com.academiabaile.backend.service;
 
+import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.Clase;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClaseNivelDTO;
 import com.academiabaile.backend.entidades.CrearClaseNivelDTO;
 import com.academiabaile.backend.entidades.Horario;
 import com.academiabaile.backend.entidades.Inscripcion;
+import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.Nivel;
 import com.academiabaile.backend.entidades.NotaCredito;
 import com.academiabaile.backend.repository.ClaseNivelRepository;
 import com.academiabaile.backend.repository.InscripcionRepository;
+import com.academiabaile.backend.repository.ModuloAccesoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ import com.academiabaile.backend.repository.HorarioRepository;
 
 @Service
 public class ClaseNivelServiceImpl implements ClaseNivelService {
+
+    @Autowired
+    private ModuloAccesoRepository moduloAccesoRepository;
 
     @Autowired
     private ClaseRepository claseRepository;
@@ -118,8 +124,15 @@ public ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto) {
 
     claseNivelRepository.save(claseNivel);
 
-    auditoriaService.registrar("admin", "CLASE_NIVEL_CREADA",
-        "Se creó clase nivel para clase ID " + dto.getClaseId());
+    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
+    auditoriaService.registrar(
+        UsuarioUtil.obtenerUsuarioActual(),
+        "CLASE_NIVEL_CREADA",
+        "Clase nivel creado: " + clase.getNombre() + " - Nivel: " + nivel.getNombre() +
+        ", Aforo: " + dto.getAforo() + ", Precio: S/ " + dto.getPrecio(),
+        modulo
+    );
+
 
     return claseNivel;
 }
@@ -151,12 +164,25 @@ public void cerrarClaseNivel(Integer id) {
             "Clase cancelada",
             "La clase fue cancelada. Puedes usar el código " + nota.getCodigo() +
             " por S/ " + nota.getValor() + " hasta el " + nota.getFechaExpiracion() + ".");
-        auditoriaService.registrar("sistema", "CLASE_CANCELADA_CLIENTE",
-            "Se notificó a cliente ID " + insc.getCliente().getId() + " por cierre de clase");
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "CLASE_CANCELADA_CLIENTE",
+            "Se notificó a cliente " + insc.getCliente().getNombres() +
+            " por cierre de clase. Nota código: " + nota.getCodigo() + ", Monto: S/ " + nota.getValor(),
+            modulo
+);
+
     }
 
-    auditoriaService.registrar("admin", "CLASE_NIVEL_CERRADA",
-        "ClaseNivel ID " + id + " fue cerrada y notificados los clientes");
+    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
+    auditoriaService.registrar(
+    UsuarioUtil.obtenerUsuarioActual(),
+    "CLASE_NIVEL_CERRADA",
+    "Clase nivel ID " + claseNivel.getId() + " cerrada manualmente.",
+    modulo
+);
+
 }
 
 @Override
@@ -173,7 +199,14 @@ public void reabrirClaseNivel(Integer id) {
     claseNivel.setFechaCierre(null); // opcional: si quieres limpiar la fecha
     claseNivelRepository.save(claseNivel);
 
-    auditoriaService.registrar("admin", "CLASE_REABIERTA", "Se reabrió la clase nivel ID " + id);
+    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
+    auditoriaService.registrar(
+    UsuarioUtil.obtenerUsuarioActual(),
+    "CLASE_REABIERTA",
+    "Clase nivel ID " + claseNivel.getId() + " reabierta.",
+    modulo
+);
+
 }
 @Override
 public List<ClaseNivel> findByClaseIdAndEstado(Integer claseId, String estado) {

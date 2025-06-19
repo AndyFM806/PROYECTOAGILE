@@ -19,7 +19,6 @@ public class InscripcionController {
     @Autowired private InscripcionService inscripcionService;
     @Autowired private InscripcionRepository inscripcionRepository;
     @Autowired private AlmacenamientoService almacenamientoService;
-    @Autowired private AuditoriaService auditoriaService;
     @Autowired private MercadoPagoRestService mpService;
     @Autowired private EmailService emailService;
 
@@ -29,11 +28,6 @@ public class InscripcionController {
         try {
             Integer id = inscripcionService.registrar(dto);
 
-            auditoriaService.registrar(
-                "sistema", "NUEVA_INSCRIPCION",
-                "Se registró una inscripción pendiente con ID " + id + " para cliente DNI: " + dto.getDni()
-            );
-
             emailService.enviarCorreo(
                 dto.getCorreo(),
                 "Registro de inscripción recibido",
@@ -42,10 +36,6 @@ public class InscripcionController {
 
             return ResponseEntity.ok("Inscripción registrada con ID: " + id);
         } catch (RuntimeException e) {
-            auditoriaService.registrar(
-                "sistema", "ERROR_INSCRIPCION",
-                "Error al registrar inscripción DNI " + dto.getDni() + ": " + e.getMessage()
-            );
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -77,8 +67,6 @@ public class InscripcionController {
         insc.setEstado("aprobada");
         inscripcionRepository.save(insc);
 
-        auditoriaService.registrar("admin", "APROBACION_MANUAL", "Admin aprobó inscripción ID " + id);
-
         emailService.enviarCorreo(
             insc.getCliente().getCorreo(),
             "Inscripción aprobada - Timba Tumbao",
@@ -105,7 +93,6 @@ public class InscripcionController {
         insc.setEstado("rechazada");
         inscripcionRepository.save(insc);
 
-        auditoriaService.registrar("admin", "RECHAZO_MANUAL", "Admin rechazó inscripción ID " + id);
 
         emailService.enviarCorreo(
             insc.getCliente().getCorreo(),
@@ -161,10 +148,6 @@ public class InscripcionController {
     public ResponseEntity<?> listarPendientesConComprobante() {
         List<Inscripcion> lista = inscripcionRepository.findByEstadoAndComprobanteUrlIsNotNull("pendiente");
 
-        auditoriaService.registrar(
-            "admin", "CONSULTA_INSCRIPCIONES_PENDIENTES",
-            "Admin consultó lista de inscripciones con comprobante pendiente"
-        );
 
         return ResponseEntity.ok(lista);
     }

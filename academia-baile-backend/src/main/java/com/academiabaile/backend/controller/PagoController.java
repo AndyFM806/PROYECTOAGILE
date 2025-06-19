@@ -40,7 +40,6 @@ public class PagoController {
             }
 
         } catch (Exception e) {
-            auditoriaService.registrar("sistema", "ERROR_PAGO", "Error al procesar notificación: " + e.getMessage());
             return ResponseEntity.badRequest().body("Error");
         }
     }
@@ -56,7 +55,6 @@ public ResponseEntity<?> verificarPago(@PathVariable String paymentId) {
         }
 
     } catch (Exception e) {
-        auditoriaService.registrar("sistema", "ERROR_VERIFICAR_PAGO", "Error al verificar pago manual: " + e.getMessage());
         return ResponseEntity.status(500).body("Error al verificar el pago");
     }
 }

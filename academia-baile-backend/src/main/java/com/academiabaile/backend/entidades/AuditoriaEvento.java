@@ -18,15 +18,17 @@ public class AuditoriaEvento {
 
     private String usuario;
 
+    private String modulo; // Nueva columna para el módulo
+
     private String tipoEvento;
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    private LocalDateTime fechaHora;
+    private LocalDateTime fecha;
 
     @PrePersist
     protected void onCreate() {
-        this.fechaHora = LocalDateTime.now();
+        this.fecha = LocalDateTime.now();
     }
 }

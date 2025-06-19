@@ -1,5 +1,6 @@
 package com.academiabaile.backend.service;
 
+import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.*;
 import com.academiabaile.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class AlumnoServiceImpl implements AlumnoService {
+    @Autowired
+    private ModuloAccesoRepository moduloAccesoRepository;
+
 
     @Autowired
     private InscripcionRepository inscripcionRepository;
@@ -55,24 +59,51 @@ public class AlumnoServiceImpl implements AlumnoService {
         insc.setFechaInscripcion(LocalDateTime.now());
 
         inscripcionRepository.save(insc);
-        auditoriaService.registrar("admin", "INSCRIPCION_MANUAL", "Alumno ID " + clienteId + " inscrito a claseNivel ID " + claseNivelId);
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
+    auditoriaService.registrar(
+    UsuarioUtil.obtenerUsuarioActual(),
+    "INSCRIPCION_MANUAL",
+    "Cliente " + cliente.getNombres() + " inscrito manualmente en clase nivel " +
+    claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre() +
+    ". Precio: S/ " + claseNivel.getPrecio(),
+    modulo
+);
+
+
     }
 
     @Override
     public void eliminarAlumnoDeClase(Integer clienteId, Integer claseNivelId) {
         Inscripcion insc = inscripcionRepository.findByClienteIdAndClaseNivelId(clienteId, claseNivelId)
         .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
-
+        ClaseNivel claseNivel = claseNivelRepository.findById(claseNivelId)
+            .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada"));
 
         inscripcionRepository.delete(insc);
 
-        auditoriaService.registrar("admin", "ELIMINAR_ALUMNO_AULA",
-                "Alumno ID " + clienteId + " eliminado de claseNivel ID " + claseNivelId);
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "ELIMINAR_ALUMNO_AULA",
+            "Alumno " + insc.getCliente().getNombres() + " eliminado de clase nivel " +
+            claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre(),
+            modulo
+        );
+
     }
 
     @Override
     public void moverAlumno(MovimientoAlumnoDTO dto) {
         moverAlumnoDeClase(dto.getClienteId(), dto.getOrigenClaseNivelId(), dto.getDestinoClaseNivelId());
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "CAMBIO_CLASE_ALUMNO",
+            "Alumno con ID " + dto.getClienteId() + " movido de clase nivel ID " +
+            dto.getOrigenClaseNivelId() + " a clase nivel ID " + dto.getDestinoClaseNivelId(),
+            modulo
+        );
+
     }
 
     @Override
@@ -88,9 +119,14 @@ public class AlumnoServiceImpl implements AlumnoService {
         nota.setFechaExpiracion(LocalDate.now().plusDays(1));
         nota.setUsada(false);
 
-        auditoriaService.registrar("admin", "NOTA_CREDITO_MANUAL",
-                "Generada nota de crédito manual para cliente ID " + clienteId + " por S/ " + valor);
-
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
+        auditoriaService.registrar(
+            UsuarioUtil.obtenerUsuarioActual(),
+            "NOTA_CREDITO_MANUAL",
+            "Nota de crédito generada manualmente para " + cliente.getNombres() +
+            " por S/ " + valor + ". Validez: 1 día.",
+            modulo
+        );
         return notaCreditoRepository.save(nota);
     }
 
@@ -122,8 +158,13 @@ public class AlumnoServiceImpl implements AlumnoService {
 
         clienteRepository.save(cliente);
 
-        auditoriaService.registrar("admin", "ACTUALIZAR_DATOS_CLIENTE",
-                "Actualizados datos de cliente ID " + dto.getId());
+        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
+        auditoriaService.registrar(
+        UsuarioUtil.obtenerUsuarioActual(),
+        "ACTUALIZAR_DATOS_CLIENTE",
+        "Datos del cliente " + cliente.getNombres() + " (DNI: " + cliente.getDni() + ") actualizados.",
+        modulo
+    );
     }
 
     @Override
@@ -149,9 +190,6 @@ public void moverAlumnoDeClase(Integer clienteId, Integer origenClaseNivelId, In
     nueva.setFechaInscripcion(LocalDateTime.now());
 
     inscripcionRepository.save(nueva);
-
-    auditoriaService.registrar("admin", "CAMBIO_CLASE_ALUMNO",
-        "Alumno ID " + clienteId + " movido de claseNivel " + origenClaseNivelId + " a " + destinoClaseNivelId);
 }
         @Override
         public List<ClaseNivel> listarClasesNoInscritas(Integer clienteId) {
