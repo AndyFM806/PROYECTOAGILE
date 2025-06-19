@@ -15,4 +15,5 @@ public class AuditoriaController {
     public Object listarEventos() {
         return repo.findAll();
     }
+    
 }

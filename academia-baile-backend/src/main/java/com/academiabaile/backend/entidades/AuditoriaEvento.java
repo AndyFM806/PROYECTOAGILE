@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 @Getter
 @Setter
@@ -24,7 +26,8 @@ public class AuditoriaEvento {
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
-
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fecha;
 
     @PrePersist
