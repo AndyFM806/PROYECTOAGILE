@@ -33,10 +33,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario editarUsuario(Long id, Usuario nuevo) {
         Usuario existente = usuarioRepository.findById(id).orElseThrow();
         existente.setNombreUsuario(nuevo.getNombreUsuario());
-        existente.setCorreoRecuperacion(nuevo.getCorreoRecuperacion());
+        if (nuevo.getContrasena() != null && !nuevo.getContrasena().isBlank()) {
+        existente.setContrasena(passwordEncoder.encode(nuevo.getContrasena()));
+        }
         existente.setRol(nuevo.getRol());
         existente.setModulos(nuevo.getModulos());
         return usuarioRepository.save(existente);
+
     }
 
     @Override
