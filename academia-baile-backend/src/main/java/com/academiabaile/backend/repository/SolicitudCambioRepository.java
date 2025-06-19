@@ -9,4 +9,5 @@ import com.academiabaile.backend.entidades.SolicitudCambio;
 public interface SolicitudCambioRepository extends JpaRepository<SolicitudCambio, Long> {
     List<SolicitudCambio> findByEstado(SolicitudCambio.EstadoSolicitud estado);
     List<SolicitudCambio> findByUsuarioId(Long usuarioId);
+    List<SolicitudCambio> findByUsuarioIdOrderByFechaSolicitudDesc(Long id);
 }

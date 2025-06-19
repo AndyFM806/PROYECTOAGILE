@@ -3,6 +3,7 @@ package com.academiabaile.backend.controller;
 import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -109,5 +110,11 @@ public String validarCodigoYActualizar(@RequestBody Map<String, String> datos) {
 }
 
 
+@GetMapping("/public/usuario-por-nombre/{username}")
+public ResponseEntity<Usuario> obtenerPorNombreUsuario(@PathVariable String username) {
+    Usuario user = usuarioRepository.findByNombreUsuario(username);
+    if (user == null) return ResponseEntity.notFound().build();
+    return ResponseEntity.ok(user);
+}
 
 }
