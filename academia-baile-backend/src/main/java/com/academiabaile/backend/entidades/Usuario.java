@@ -38,4 +38,7 @@ public class Usuario {
         ADMIN,
         RECEPCIONISTA
     }
+    @Column(name = "codigo_recuperacion")
+    private String codigoRecuperacion;
+
 }

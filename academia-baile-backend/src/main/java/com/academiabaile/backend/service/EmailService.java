@@ -18,4 +18,5 @@ public class EmailService {
         mensaje.setText(cuerpo);
         mailSender.send(mensaje);
     }
+
 }
