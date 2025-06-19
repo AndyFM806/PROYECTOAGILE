@@ -5,12 +5,14 @@ import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -99,38 +101,27 @@ public class UsuarioController {
         int codigo = (int)(Math.random() * 900000) + 100000; // 6 dígitos aleatorios
         return String.valueOf(codigo);
     }
-        @PostMapping("/validar-codigo")
-public String validarCodigoYActualizar(@RequestBody Map<String, String> datos) {
-    String correo = datos.get("correo");
-    String codigo = datos.get("codigo");
-    String nuevaContrasena = datos.get("nuevaContrasena");
+       @PostMapping("/validar-codigo")
+public ResponseEntity<?> validarCodigo(@RequestBody Map<String, String> payload) {
+    String codigo = payload.get("codigo");
+    String nuevaContrasena = payload.get("nuevaContrasena");
 
-    Usuario admin = usuarioRepository.findByCorreoRecuperacion(correo);
-
-    if (admin == null || admin.getRol() != Usuario.Rol.ADMIN) {
-        return "Correo no válido o no pertenece a un administrador.";
+    // Buscar por código
+    Optional<Usuario> optionalUsuario = usuarioRepository.findByCodigoRecuperacion(codigo);
+    if (optionalUsuario.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Código inválido");
     }
 
-    if (!codigo.equals(admin.getCodigoRecuperacion())) {
-        return "Código incorrecto.";
-    }
+    Usuario usuario = optionalUsuario.get();
 
-    String nuevaPassEncriptada = passwordEncoder.encode(nuevaContrasena);
-    admin.setContrasena(nuevaPassEncriptada);
-    admin.setCodigoRecuperacion(null); // eliminar código
+    // Cambiar contraseña
+    usuario.setContrasena(passwordEncoder.encode(nuevaContrasena));
+    usuario.setCodigoRecuperacion(null); // opcional: limpiar el código después de usarlo
+    usuarioRepository.save(usuario);
 
-    usuarioRepository.save(admin);
-    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
-    auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
-        "VALIDACION_CODIGO_RECUPERACION",
-        "Código de recuperación validado para usuario: " + admin.getNombreUsuario() ,
-        modulo
-    );
-
-
-    return "Contraseña actualizada correctamente.";
+    return ResponseEntity.ok("Contraseña actualizada correctamente");
 }
+
 
 
 @GetMapping("/public/usuario-por-nombre/{username}")

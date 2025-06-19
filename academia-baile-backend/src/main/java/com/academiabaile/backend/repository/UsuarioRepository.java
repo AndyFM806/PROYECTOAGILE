@@ -1,6 +1,8 @@
 package com.academiabaile.backend.repository;
 
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.academiabaile.backend.entidades.*;
 import com.academiabaile.backend.entidades.Usuario.Rol;
@@ -10,6 +12,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Usuario findByNombreUsuario(String nombreUsuario);
     Usuario findByCorreoRecuperacion(String correo);
     Usuario findByRol(Rol rol);
+    Optional<Usuario> findByCodigoRecuperacion(String codigoRecuperacion);
 }
 
 
