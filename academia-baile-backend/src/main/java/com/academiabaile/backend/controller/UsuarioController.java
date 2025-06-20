@@ -5,9 +5,12 @@ import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.Rol;
 import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.service.UsuarioService;
+
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -131,6 +134,11 @@ public ResponseEntity<Usuario> obtenerPorNombreUsuario(@PathVariable String user
     return userOpt.map(ResponseEntity::ok)
               .orElse(ResponseEntity.notFound().build());
 
+}
+@GetMapping("/usuario-actual")
+public ResponseEntity<String> obtenerUsuarioActual() {
+    org.springframework.security.core.Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    return ResponseEntity.ok("Usuario logeado: " + auth.getName());
 }
 
 }
