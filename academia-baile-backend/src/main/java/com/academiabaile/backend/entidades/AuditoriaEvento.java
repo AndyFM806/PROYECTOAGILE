@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -18,12 +17,6 @@ public class AuditoriaEvento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = true)
-    private Usuario usuario;
-
-
 
     private String modulo; // Nueva columna para el módulo
 

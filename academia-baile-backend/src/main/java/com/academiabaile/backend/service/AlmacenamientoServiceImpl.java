@@ -31,5 +31,6 @@
             } catch (IOException e) {
                 throw new RuntimeException("Error al subir el archivo a Cloudinary: " + e.getMessage(), e);
             }
+                
         }
     }

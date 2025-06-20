@@ -1,6 +1,5 @@
 package com.academiabaile.backend.service;
 
-import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.SolicitudCambio;
 import com.academiabaile.backend.entidades.SolicitudCambio.EstadoSolicitud;
@@ -26,20 +25,36 @@ public class SolicitudCambioServiceImpl implements SolicitudCambioService {
 
     @Autowired
     private ModuloAccesoRepository moduloAccesoRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
 
    @Override
-    public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
+public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
+    // ⚠️ Validar que el usuario no sea null y tenga un ID
+    if (solicitud.getUsuario() == null || solicitud.getUsuario().getId() == null) {
+        throw new IllegalArgumentException("Debe proporcionar un usuario con ID válido.");
+    }
+
+    // ✅ Buscar el objeto completo desde la base de datos
+    Usuario usuario = usuarioRepository.findById(solicitud.getUsuario().getId())
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    solicitud.setUsuario(usuario);
     solicitud.setEstado(EstadoSolicitud.PENDIENTE);
     solicitud.setFechaCreacion(LocalDateTime.now());
-    
-    // Guardar solicitud primero
+
+    // Guardar solicitud
     SolicitudCambio guardada = solicitudCambioRepository.save(solicitud);
 
-    // Obtener el usuario completo desde su ID (ya que solo se envía el ID desde el frontend)
-    solicitudCambioRepository.save(solicitud);
+    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("usuarios");
+    auditoriaService.registrar(
+        "SOLICITUD_CAMBIO",
+        solicitud.getDetalle(),
+        modulo
+    );
 
-        return guardada;
+    return guardada;
 }
 
 
@@ -69,7 +84,6 @@ public class SolicitudCambioServiceImpl implements SolicitudCambioService {
                 " por el admin. Respuesta: " + respuesta;
 
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             tipo,
             descripcion,
             modulo

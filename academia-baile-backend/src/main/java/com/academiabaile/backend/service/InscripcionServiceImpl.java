@@ -11,7 +11,6 @@ import com.academiabaile.backend.entidades.MovimientoClienteDTO;
 import com.academiabaile.backend.entidades.NotaCredito;
 import com.academiabaile.backend.entidades.Cliente;
 import com.academiabaile.backend.entidades.Inscripcion;
-import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.repository.ClienteRepository;
 import com.academiabaile.backend.repository.ClaseNivelRepository;
@@ -109,7 +108,6 @@ public Integer registrar(InscripcionDTO dto) {
             : "Por confirmar";
 
     auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
         "REGISTRO_INSCRIPCION",
         "Cliente " + cliente.getNombres() + " inscrito en " +
         claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre() +
@@ -135,7 +133,6 @@ public Integer registrar(InscripcionDTO dto) {
 
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "PAGO_DIFERENCIA_COMPROBANTE",
             "Pago con comprobante subido para inscripción ID " + inscripcionId +
             ". Cliente: " + inscripcion.getCliente().getNombres() +
@@ -160,7 +157,6 @@ public Integer registrar(InscripcionDTO dto) {
 
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "PAGO_DIFERENCIA_MERCADO_PAGO",
             "Pago completado vía Mercado Pago para inscripción ID " + inscripcionId +
             ". Cliente: " + inscripcion.getCliente().getNombres(),
@@ -213,7 +209,6 @@ public Integer registrarManual(InscripcionDTO dto) {
 
    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
     auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
         "INSCRIPCION_MANUAL",
         "Cliente " + cliente.getNombres() + " inscrito manualmente en clase " +
         claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre() +
@@ -272,7 +267,6 @@ public void moverCliente(MovimientoClienteDTO dto) {
 
     ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
     auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
         "CAMBIO_CLASE_CLIENTE",
         "Cliente " + cliente.getNombres() + " movido de claseNivel ID " +
         origen.getId() + " a claseNivel ID " + destino.getId(),

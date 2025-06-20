@@ -1,6 +1,5 @@
 package com.academiabaile.backend.service;
 
-import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.Clase;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClaseNivelDTO;
@@ -126,7 +125,6 @@ public ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto) {
 
     ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
     auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
         "CLASE_NIVEL_CREADA",
         "Clase nivel creado: " + clase.getNombre() + " - Nivel: " + nivel.getNombre() +
         ", Aforo: " + dto.getAforo() + ", Precio: S/ " + dto.getPrecio(),
@@ -166,7 +164,6 @@ public void cerrarClaseNivel(Integer id) {
             " por S/ " + nota.getValor() + " hasta el " + nota.getFechaExpiracion() + ".");
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "CLASE_CANCELADA_CLIENTE",
             "Se notificó a cliente " + insc.getCliente().getNombres() +
             " por cierre de clase. Nota código: " + nota.getCodigo() + ", Monto: S/ " + nota.getValor(),
@@ -177,7 +174,6 @@ public void cerrarClaseNivel(Integer id) {
 
     ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
     auditoriaService.registrar(
-    UsuarioUtil.obtenerUsuarioActual(),
     "CLASE_NIVEL_CERRADA",
     "Clase nivel ID " + claseNivel.getId() + " cerrada manualmente.",
     modulo
@@ -201,7 +197,6 @@ public void reabrirClaseNivel(Integer id) {
 
     ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
     auditoriaService.registrar(
-    UsuarioUtil.obtenerUsuarioActual(),
     "CLASE_REABIERTA",
     "Clase nivel ID " + claseNivel.getId() + " reabierta.",
     modulo

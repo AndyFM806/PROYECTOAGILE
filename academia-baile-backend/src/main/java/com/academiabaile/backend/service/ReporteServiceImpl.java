@@ -55,7 +55,6 @@ public byte[] generarReporteAuditoria(FiltroReporteDTO filtros) {
 
     for (AuditoriaEvento e : eventos) {
         table.addCell(e.getFecha().toString());
-        table.addCell(e.getUsuario().getNombreUsuario());
 
         table.addCell(e.getModulo());
         table.addCell(e.getDescripcion());

@@ -88,7 +88,6 @@ public class UsuarioController {
         emailService.enviarCorreo(admin.getCorreoRecuperacion(), "Recuperación de contraseña", mensaje);
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "RECUPERACION_CONTRASEÑA",
             "Solicitud de recuperación de contraseña para usuario: " + admin.getNombreUsuario(),
             modulo

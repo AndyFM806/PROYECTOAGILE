@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.repository.ModuloAccesoRepository;
@@ -36,7 +35,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
         auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
         "USUARIO_CREADO",
         "Usuario creado: " + usuario.getNombreUsuario() + " - Rol: " + usuario.getRol(),
         modulo
@@ -56,7 +54,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         existente.setModulos(nuevo.getModulos());
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "USUARIO_EDITADO",
             "Usuario editado: " + nuevo.getNombreUsuario() + " - Rol: " + nuevo.getRol(),
             modulo
@@ -72,7 +69,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.deleteById(id);
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "USUARIO_ELIMINADO",
             "Usuario eliminado: " + usuario.getNombreUsuario(),
             modulo

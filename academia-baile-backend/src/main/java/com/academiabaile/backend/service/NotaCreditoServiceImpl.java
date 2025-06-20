@@ -1,6 +1,5 @@
 package com.academiabaile.backend.service;
 
-import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.*;
 import com.academiabaile.backend.repository.ModuloAccesoRepository;
 import com.academiabaile.backend.repository.NotaCreditoRepository;
@@ -32,7 +31,6 @@ public class NotaCreditoServiceImpl implements NotaCreditoService {
         nota.setClaseCancelada(claseCancelada);
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "NOTA_GENERADA",
             "Nota de crédito emitida para cliente " + cliente.getNombres() +
             " por S/ " + valor + ", Clase cancelada: " + claseCancelada.getClase().getNombre(),
@@ -48,7 +46,6 @@ public void marcarComoUsada(NotaCredito notaCredito) {
             .orElseThrow(() -> new IllegalArgumentException("Nota de crédito no encontrada"));
     ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
 auditoriaService.registrar(
-    UsuarioUtil.obtenerUsuarioActual(),
     "NOTA_USADA",
     "Nota de crédito usada: código " + nota.getCodigo() + " por cliente " +
     nota.getCliente().getNombres(),
@@ -84,7 +81,6 @@ public NotaCredito validarNota(String codigo) {
     nota.setClaseCancelada(claseCancelada); // ✅ ¡Esto es lo que faltaba!
     ModuloAcceso modulo = moduloAccesoRepository.findByNombre("INSCRIPCIONES");
     auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
         "NOTA_MANUAL",
         "Nota de crédito creada manualmente para cliente " + cliente.getNombres() +
         " por S/ " + valor + ", Clase cancelada: " + (claseCancelada != null ? claseCancelada.getClase().getNombre() : "N/A"),

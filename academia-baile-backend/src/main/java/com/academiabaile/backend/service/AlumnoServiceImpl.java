@@ -61,7 +61,6 @@ public class AlumnoServiceImpl implements AlumnoService {
         inscripcionRepository.save(insc);
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
     auditoriaService.registrar(
-    UsuarioUtil.obtenerUsuarioActual(),
     "INSCRIPCION_MANUAL",
     "Cliente " + cliente.getNombres() + " inscrito manualmente en clase nivel " +
     claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre() +
@@ -83,7 +82,6 @@ public class AlumnoServiceImpl implements AlumnoService {
 
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "ELIMINAR_ALUMNO_AULA",
             "Alumno " + insc.getCliente().getNombres() + " eliminado de clase nivel " +
             claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre(),
@@ -97,7 +95,6 @@ public class AlumnoServiceImpl implements AlumnoService {
         moverAlumnoDeClase(dto.getClienteId(), dto.getOrigenClaseNivelId(), dto.getDestinoClaseNivelId());
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "CAMBIO_CLASE_ALUMNO",
             "Alumno con ID " + dto.getClienteId() + " movido de clase nivel ID " +
             dto.getOrigenClaseNivelId() + " a clase nivel ID " + dto.getDestinoClaseNivelId(),
@@ -121,7 +118,6 @@ public class AlumnoServiceImpl implements AlumnoService {
 
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
         auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
             "NOTA_CREDITO_MANUAL",
             "Nota de crédito generada manualmente para " + cliente.getNombres() +
             " por S/ " + valor + ". Validez: 1 día.",
@@ -160,7 +156,6 @@ public class AlumnoServiceImpl implements AlumnoService {
 
         ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
         auditoriaService.registrar(
-        UsuarioUtil.obtenerUsuarioActual(),
         "ACTUALIZAR_DATOS_CLIENTE",
         "Datos del cliente " + cliente.getNombres() + " (DNI: " + cliente.getDni() + ") actualizados.",
         modulo
