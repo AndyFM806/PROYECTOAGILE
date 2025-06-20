@@ -3,6 +3,7 @@ package com.academiabaile.backend.service;
 import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.AuditoriaEvento;
 import com.academiabaile.backend.entidades.ModuloAcceso;
+import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.repository.AuditoriaEventoRepository;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,8 @@ public class AuditoriaServiceImpl implements AuditoriaService {
     private AuditoriaEventoRepository auditoriaEventoRepository;
 
     @Override
-    public void registrar(String usuario, String tipoEvento, String descripcion,ModuloAcceso modulo) {
+    public void registrar(Usuario usuario, String tipoEvento, String descripcion,ModuloAcceso modulo) {
+        
          AuditoriaEvento evento = new AuditoriaEvento();
         evento.setUsuario(UsuarioUtil.obtenerUsuarioActual());
         evento.setModulo(modulo.getNombre()); // Usa bien esta columna en tus reportes

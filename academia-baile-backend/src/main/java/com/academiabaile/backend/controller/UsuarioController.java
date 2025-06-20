@@ -126,9 +126,10 @@ public ResponseEntity<?> validarCodigo(@RequestBody Map<String, String> payload)
 
 @GetMapping("/public/usuario-por-nombre/{username}")
 public ResponseEntity<Usuario> obtenerPorNombreUsuario(@PathVariable String username) {
-    Usuario user = usuarioRepository.findByNombreUsuario(username);
-    if (user == null) return ResponseEntity.notFound().build();
-    return ResponseEntity.ok(user);
+    Optional<Usuario> userOpt = usuarioRepository.findByNombreUsuario(username);
+    return userOpt.map(ResponseEntity::ok)
+              .orElse(ResponseEntity.notFound().build());
+
 }
 
 }

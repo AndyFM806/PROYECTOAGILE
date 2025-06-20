@@ -18,7 +18,7 @@ public class AuditoriaEvento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String usuario;
+    private Usuario usuario;
 
     private String modulo; // Nueva columna para el módulo
 
@@ -26,7 +26,7 @@ public class AuditoriaEvento {
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fecha;
 

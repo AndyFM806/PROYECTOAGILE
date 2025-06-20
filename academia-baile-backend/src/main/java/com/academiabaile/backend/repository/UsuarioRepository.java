@@ -9,7 +9,7 @@ import com.academiabaile.backend.entidades.Usuario.Rol;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByNombreUsuario(String nombreUsuario);
-    Usuario findByNombreUsuario(String nombreUsuario);
+    Optional<Usuario> findByNombreUsuario(String nombreUsuario);
     Usuario findByCorreoRecuperacion(String correo);
     Usuario findByRol(Rol rol);
     Optional<Usuario> findByCodigoRecuperacion(String codigoRecuperacion);
