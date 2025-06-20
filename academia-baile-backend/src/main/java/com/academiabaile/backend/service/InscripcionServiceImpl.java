@@ -1,5 +1,6 @@
 package com.academiabaile.backend.service;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,20 +52,33 @@ public Integer registrar(InscripcionDTO dto) {
     }
 
     // Obtener o crear cliente
-    Cliente cliente = clienteRepository.findByDni(dto.getDni())
-        .orElseGet(() -> {
-            Cliente nuevo = new Cliente();
-            nuevo.setDni(dto.getDni());
-            nuevo.setNombres(dto.getNombres());
-            nuevo.setApellidos(dto.getApellidos()); // ✅ Agregado correctamente
-            nuevo.setCorreo(dto.getCorreo());
-            return clienteRepository.save(nuevo);
-        });
+    // Buscar si el cliente ya existe por DNI
+        Optional<Cliente> clienteOpt = clienteRepository.findByDni(dto.getDni());
+        Cliente cliente;
 
-    // Verificar si ya está inscrito en esta clase
-    if (inscripcionRepository.existsByClienteAndClaseNivel(cliente, claseNivel)) {
-        throw new RuntimeException("El cliente ya está inscrito en esta clase");
-    }
+        if (clienteOpt.isPresent()) {
+            cliente = clienteOpt.get();
+
+            // Verificar si ya está inscrito con estado APROBADA
+            boolean yaInscrito = inscripcionRepository.existsByClienteAndClaseNivelAndEstado(
+                cliente, claseNivel, "aprobada"
+            );
+
+            if (yaInscrito) {
+                throw new RuntimeException("El cliente ya tiene una inscripción aprobada en esta clase.");
+            }
+
+        } else {
+            // Si no existe, crearlo normalmente
+            cliente = new Cliente();
+            cliente.setDni(dto.getDni());
+            cliente.setNombres(dto.getNombres());
+            cliente.setApellidos(dto.getApellidos());
+            cliente.setCorreo(dto.getCorreo());
+            cliente.setDireccion(dto.getDireccion()); // si lo manejas
+            cliente = clienteRepository.save(cliente);
+        }
+
 
     // Crear nueva inscripción
     Inscripcion inscripcion = new Inscripcion();
