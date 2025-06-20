@@ -50,7 +50,7 @@ public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
     ModuloAcceso modulo = moduloAccesoRepository.findByNombre("usuarios");
     auditoriaService.registrar(
         "SOLICITUD_CAMBIO",
-        solicitud.getDetalle(),
+        usuario.getNombreUsuario() + " ha solicitado un cambio ",
         modulo
     );
 
