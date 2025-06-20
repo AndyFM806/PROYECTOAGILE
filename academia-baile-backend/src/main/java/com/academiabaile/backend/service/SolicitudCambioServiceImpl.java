@@ -4,8 +4,11 @@ import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.SolicitudCambio;
 import com.academiabaile.backend.entidades.SolicitudCambio.EstadoSolicitud;
+import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.repository.ModuloAccesoRepository;
 import com.academiabaile.backend.repository.SolicitudCambioRepository;
+import com.academiabaile.backend.repository.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,23 +27,23 @@ public class SolicitudCambioServiceImpl implements SolicitudCambioService {
     @Autowired
     private ModuloAccesoRepository moduloAccesoRepository;
 
-    @Override
-    public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
-        solicitud.setEstado(EstadoSolicitud.PENDIENTE);
-        solicitud.setFechaCreacion(LocalDateTime.now());
-        SolicitudCambio guardada = solicitudCambioRepository.save(solicitud);
 
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
-        auditoriaService.registrar(
-            UsuarioUtil.obtenerUsuarioActual(),
-            "SOLICITUD_CAMBIO_REGISTRADA",
-            "Solicitud de tipo " + solicitud.getTipoSolicitud() + " registrada por el usuario " +
-            solicitud.getUsuario().getNombreUsuario(),
-            modulo
-        );
+   @Override
+    public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
+    solicitud.setEstado(EstadoSolicitud.PENDIENTE);
+    solicitud.setFechaCreacion(LocalDateTime.now());
+    
+    // Guardar solicitud primero
+    SolicitudCambio guardada = solicitudCambioRepository.save(solicitud);
+
+    // Obtener el usuario completo desde su ID (ya que solo se envía el ID desde el frontend)
+    solicitudCambioRepository.save(solicitud);
 
         return guardada;
-    }
+}
+
+
+
 
     @Override
     public List<SolicitudCambio> listarPendientes() {

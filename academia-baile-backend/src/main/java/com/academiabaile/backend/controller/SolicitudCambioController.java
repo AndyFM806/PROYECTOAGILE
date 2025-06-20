@@ -1,8 +1,14 @@
 package com.academiabaile.backend.controller;
 
+import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.SolicitudCambio;
+import com.academiabaile.backend.entidades.Usuario;
+import com.academiabaile.backend.repository.ModuloAccesoRepository;
+import com.academiabaile.backend.repository.UsuarioRepository;
+import com.academiabaile.backend.service.AuditoriaService;
 import com.academiabaile.backend.service.SolicitudCambioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,14 +16,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/solicitudes")
 public class SolicitudCambioController {
-
     @Autowired
     private SolicitudCambioService solicitudCambioService;
 
     @PostMapping
-    public SolicitudCambio registrar(@RequestBody SolicitudCambio solicitud) {
-        return solicitudCambioService.registrarSolicitud(solicitud);
-    }
+public ResponseEntity<SolicitudCambio> registrar(@RequestBody SolicitudCambio solicitud) {
+    // Guardar solicitud
+    SolicitudCambio guardada = solicitudCambioService.registrarSolicitud(solicitud);
+    return ResponseEntity.ok(guardada);
+}
+
+
+    
 
     @GetMapping("/pendientes")
     public List<SolicitudCambio> listarPendientes() {
