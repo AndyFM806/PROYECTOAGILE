@@ -2,7 +2,7 @@ package com.academiabaile.backend.config;
 
 import com.academiabaile.backend.entidades.ModuloAcceso;
 import com.academiabaile.backend.entidades.Usuario;
-import com.academiabaile.backend.entidades.Usuario.Rol;
+import com.academiabaile.backend.entidades.Rol;
 import com.academiabaile.backend.repository.ModuloAccesoRepository;
 import com.academiabaile.backend.repository.UsuarioRepository;
 

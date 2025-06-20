@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Usuario {
+    
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +25,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
+
     private boolean estado = true;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -34,10 +36,7 @@ public class Usuario {
     )
     private Set<ModuloAcceso> modulos;
 
-    public enum Rol {
-        ADMIN,
-        RECEPCIONISTA
-    }
+
     @Column(name = "codigo_recuperacion")
     private String codigoRecuperacion;
 

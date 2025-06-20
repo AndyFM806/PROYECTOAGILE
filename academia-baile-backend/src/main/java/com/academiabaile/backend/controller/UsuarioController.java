@@ -2,6 +2,7 @@ package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.config.UsuarioUtil;
 import com.academiabaile.backend.entidades.ModuloAcceso;
+import com.academiabaile.backend.entidades.Rol;
 import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ public class UsuarioController {
     @PostMapping("/recuperar")
     public String recuperarContrasena() {
         // Buscar al usuario con rol ADMIN
-        Usuario admin = usuarioRepository.findByRol(Usuario.Rol.ADMIN);
+        Usuario admin = usuarioRepository.findByRol(Rol.ADMIN);
 
         if (admin == null || admin.getCorreoRecuperacion() == null || admin.getCorreoRecuperacion().isBlank()) {
             return "No se encontró un administrador con correo de recuperación configurado.";

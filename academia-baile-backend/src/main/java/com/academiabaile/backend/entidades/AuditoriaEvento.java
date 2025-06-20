@@ -18,7 +18,9 @@ public class AuditoriaEvento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
     private Usuario usuario;
+
 
     private String modulo; // Nueva columna para el módulo
 
