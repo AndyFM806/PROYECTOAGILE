@@ -18,11 +18,9 @@ public class MercadoPagoRestService {
     private String accessToken;
 
     private final InscripcionRepository inscripcionRepository;
-    private final AuditoriaService auditoriaService;
 
-    public MercadoPagoRestService(InscripcionRepository inscripcionRepository, AuditoriaService auditoriaService) {
+    public MercadoPagoRestService(InscripcionRepository inscripcionRepository) {
         this.inscripcionRepository = inscripcionRepository;
-        this.auditoriaService = auditoriaService;
     }
 
     public String crearPreferencia(Double precio, String nombreClase, Integer inscripcionId) {

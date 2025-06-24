@@ -123,14 +123,6 @@ public ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto) {
 
     claseNivelRepository.save(claseNivel);
 
-    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
-    auditoriaService.registrar(
-        "CLASE_NIVEL_CREADA",
-        "Clase nivel creado: " + clase.getNombre() + " - Nivel: " + nivel.getNombre() +
-        ", Aforo: " + dto.getAforo() + ", Precio: S/ " + dto.getPrecio(),
-        modulo
-    );
-
 
     return claseNivel;
 }
@@ -162,13 +154,6 @@ public void cerrarClaseNivel(Integer id) {
             "Clase cancelada",
             "La clase fue cancelada. Puedes usar el código " + nota.getCodigo() +
             " por S/ " + nota.getValor() + " hasta el " + nota.getFechaExpiracion() + ".");
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
-        auditoriaService.registrar(
-            "CLASE_CANCELADA_CLIENTE",
-            "Se notificó a cliente " + insc.getCliente().getNombres() +
-            " por cierre de clase. Nota código: " + nota.getCodigo() + ", Monto: S/ " + nota.getValor(),
-            modulo
-);
 
     }
 
@@ -194,13 +179,6 @@ public void reabrirClaseNivel(Integer id) {
     claseNivel.setMotivoCancelacion(null);
     claseNivel.setFechaCierre(null); // opcional: si quieres limpiar la fecha
     claseNivelRepository.save(claseNivel);
-
-    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("CLASES");
-    auditoriaService.registrar(
-    "CLASE_REABIERTA",
-    "Clase nivel ID " + claseNivel.getId() + " reabierta.",
-    modulo
-);
 
 }
 @Override

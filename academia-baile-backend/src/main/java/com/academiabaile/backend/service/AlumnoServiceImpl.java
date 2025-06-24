@@ -1,6 +1,6 @@
 package com.academiabaile.backend.service;
 
-import com.academiabaile.backend.config.UsuarioUtil;
+
 import com.academiabaile.backend.entidades.*;
 import com.academiabaile.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class AlumnoServiceImpl implements AlumnoService {
-    @Autowired
-    private ModuloAccesoRepository moduloAccesoRepository;
+
 
 
     @Autowired
@@ -27,8 +26,7 @@ public class AlumnoServiceImpl implements AlumnoService {
     @Autowired
     private ClaseNivelRepository claseNivelRepository;
 
-    @Autowired
-    private AuditoriaService auditoriaService;
+
 
     @Autowired
     private NotaCreditoRepository notaCreditoRepository;
@@ -59,14 +57,7 @@ public class AlumnoServiceImpl implements AlumnoService {
         insc.setFechaInscripcion(LocalDateTime.now());
 
         inscripcionRepository.save(insc);
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
-    auditoriaService.registrar(
-    "INSCRIPCION_MANUAL",
-    "Cliente " + cliente.getNombres() + " inscrito manualmente en clase nivel " +
-    claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre() +
-    ". Precio: S/ " + claseNivel.getPrecio(),
-    modulo
-);
+
 
 
     }
@@ -75,31 +66,18 @@ public class AlumnoServiceImpl implements AlumnoService {
     public void eliminarAlumnoDeClase(Integer clienteId, Integer claseNivelId) {
         Inscripcion insc = inscripcionRepository.findByClienteIdAndClaseNivelId(clienteId, claseNivelId)
         .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
-        ClaseNivel claseNivel = claseNivelRepository.findById(claseNivelId)
-            .orElseThrow(() -> new RuntimeException("ClaseNivel no encontrada"));
+
 
         inscripcionRepository.delete(insc);
 
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
-        auditoriaService.registrar(
-            "ELIMINAR_ALUMNO_AULA",
-            "Alumno " + insc.getCliente().getNombres() + " eliminado de clase nivel " +
-            claseNivel.getClase().getNombre() + " - Nivel: " + claseNivel.getNivel().getNombre(),
-            modulo
-        );
+
 
     }
 
     @Override
     public void moverAlumno(MovimientoAlumnoDTO dto) {
         moverAlumnoDeClase(dto.getClienteId(), dto.getOrigenClaseNivelId(), dto.getDestinoClaseNivelId());
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
-        auditoriaService.registrar(
-            "CAMBIO_CLASE_ALUMNO",
-            "Alumno con ID " + dto.getClienteId() + " movido de clase nivel ID " +
-            dto.getOrigenClaseNivelId() + " a clase nivel ID " + dto.getDestinoClaseNivelId(),
-            modulo
-        );
+
 
     }
 
@@ -116,13 +94,7 @@ public class AlumnoServiceImpl implements AlumnoService {
         nota.setFechaExpiracion(LocalDate.now().plusDays(1));
         nota.setUsada(false);
 
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
-        auditoriaService.registrar(
-            "NOTA_CREDITO_MANUAL",
-            "Nota de crédito generada manualmente para " + cliente.getNombres() +
-            " por S/ " + valor + ". Validez: 1 día.",
-            modulo
-        );
+
         return notaCreditoRepository.save(nota);
     }
 
@@ -153,13 +125,6 @@ public class AlumnoServiceImpl implements AlumnoService {
         cliente.setDni(dto.getDni());
 
         clienteRepository.save(cliente);
-
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("ALUMNOS");
-        auditoriaService.registrar(
-        "ACTUALIZAR_DATOS_CLIENTE",
-        "Datos del cliente " + cliente.getNombres() + " (DNI: " + cliente.getDni() + ") actualizados.",
-        modulo
-    );
     }
 
     @Override
