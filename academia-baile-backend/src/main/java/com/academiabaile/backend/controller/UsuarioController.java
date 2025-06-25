@@ -1,12 +1,10 @@
 package com.academiabaile.backend.controller;
 
-import com.academiabaile.backend.config.UsuarioUtil;
-import com.academiabaile.backend.entidades.ModuloAcceso;
+
 import com.academiabaile.backend.entidades.Rol;
 import com.academiabaile.backend.entidades.Usuario;
 import com.academiabaile.backend.service.UsuarioService;
 
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +19,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
-    @Autowired
-    private com.academiabaile.backend.repository.ModuloAccesoRepository moduloAccesoRepository;
 
-    @Autowired
-    private com.academiabaile.backend.service.AuditoriaService auditoriaService;
+
+  
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -86,12 +82,7 @@ public class UsuarioController {
 
         // Enviar el correo
         emailService.enviarCorreo(admin.getCorreoRecuperacion(), "Recuperación de contraseña", mensaje);
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
-        auditoriaService.registrar(
-            "RECUPERACION_CONTRASEÑA",
-            "Solicitud de recuperación de contraseña para usuario: " + admin.getNombreUsuario(),
-            modulo
-        );
+
 
 
         return "Se envió un código de recuperación al correo del administrador.";

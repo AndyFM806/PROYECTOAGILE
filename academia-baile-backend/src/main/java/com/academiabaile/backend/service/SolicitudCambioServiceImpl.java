@@ -20,11 +20,7 @@ public class SolicitudCambioServiceImpl implements SolicitudCambioService {
     @Autowired
     private SolicitudCambioRepository solicitudCambioRepository;
 
-    @Autowired
-    private AuditoriaService auditoriaService;
 
-    @Autowired
-    private ModuloAccesoRepository moduloAccesoRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -47,12 +43,7 @@ public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
     // Guardar solicitud
     SolicitudCambio guardada = solicitudCambioRepository.save(solicitud);
 
-    ModuloAcceso modulo = moduloAccesoRepository.findByNombre("usuarios");
-    auditoriaService.registrar(
-        "SOLICITUD_CAMBIO",
-        usuario.getNombreUsuario() + " ha solicitado un cambio ",
-        modulo
-    );
+
 
     return guardada;
 }
@@ -78,16 +69,7 @@ public SolicitudCambio registrarSolicitud(SolicitudCambio solicitud) {
         solicitud.setEstado(aprobar ? EstadoSolicitud.ATENDIDA : EstadoSolicitud.RECHAZADA);
         SolicitudCambio actualizada = solicitudCambioRepository.save(solicitud);
 
-        ModuloAcceso modulo = moduloAccesoRepository.findByNombre("USUARIOS");
-        String tipo = aprobar ? "SOLICITUD_CAMBIO_APROBADA" : "SOLICITUD_CAMBIO_RECHAZADA";
-        String descripcion = "Solicitud ID " + id + " fue " + (aprobar ? "aprobada" : "rechazada") +
-                " por el admin. Respuesta: " + respuesta;
 
-        auditoriaService.registrar(
-            tipo,
-            descripcion,
-            modulo
-        );
 
         return actualizada;
     }

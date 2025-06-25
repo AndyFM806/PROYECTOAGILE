@@ -1,11 +1,7 @@
 package com.academiabaile.backend.controller;
 
-import com.academiabaile.backend.entidades.ModuloAcceso;
+
 import com.academiabaile.backend.entidades.SolicitudCambio;
-import com.academiabaile.backend.entidades.Usuario;
-import com.academiabaile.backend.repository.ModuloAccesoRepository;
-import com.academiabaile.backend.repository.UsuarioRepository;
-import com.academiabaile.backend.service.AuditoriaService;
 import com.academiabaile.backend.service.SolicitudCambioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -14,7 +14,8 @@ public class CrearClaseNivelDTO {
     private Double precio;
     private Integer aforo;
     private LocalDate fechaCierre;
-    private String estado; // Agregado campo estado
+    private String estado; 
+    private Integer aulaId;// Agregado campo estado
 
     public LocalDate getFechaCierre() {
         return fechaCierre;
@@ -31,4 +32,5 @@ public class CrearClaseNivelDTO {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+
 }

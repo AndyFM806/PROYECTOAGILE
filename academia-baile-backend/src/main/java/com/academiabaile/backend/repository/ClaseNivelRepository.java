@@ -13,7 +13,7 @@ public interface ClaseNivelRepository extends JpaRepository<ClaseNivel, Integer>
     List<ClaseNivel> findByClaseIdAndEstado(Integer claseId, String estado);
     List<ClaseNivel> findByEstado(String estado);
     Optional<ClaseNivel> findById(Integer id);
-
-
+    Integer countByHorarioId(Integer horarioId);
+    boolean existsByHorarioIdAndAulaId(Integer horarioId, Integer aulaId);
 }
 

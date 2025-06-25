@@ -22,6 +22,7 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     boolean existsByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
     java.util.Optional<Inscripcion> findByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
     boolean existsByClienteAndClaseNivelAndEstado(Cliente cliente, ClaseNivel claseNivel,String estado);
-
+boolean existsByClienteIdAndClaseNivel_HorarioIdAndEstado(Long clienteId, Integer horarioId, String estado);
     List<Inscripcion> findByClaseNivelId(Integer claseNivelId);
+    
 }

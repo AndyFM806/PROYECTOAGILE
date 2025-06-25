@@ -1,7 +1,6 @@
 package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.repository.InscripcionRepository;
-import com.academiabaile.backend.service.AuditoriaService;
 import com.academiabaile.backend.service.MercadoPagoRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,7 @@ import java.util.Map;
 public class PagoController {
 
 
-    @Autowired
-    private AuditoriaService auditoriaService;
+
 
     @Autowired
     private MercadoPagoRestService mercadoPagoRestService;

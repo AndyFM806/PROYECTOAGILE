@@ -40,6 +40,9 @@ public class ClaseNivel {
     @Column(name = "fecha_cierre")
     private LocalDate fechaCierre;
     
+            @ManyToOne
+        private Aula aula;
+
     }
 
 

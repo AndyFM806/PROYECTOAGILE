@@ -21,8 +21,7 @@ public class ClienteController {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    @Autowired
-    private com.academiabaile.backend.service.AuditoriaService auditoriaService;
+
 
     // ✅ Registro manual de cliente (sin claseNivel, ya no se usa directamente)
     @PostMapping

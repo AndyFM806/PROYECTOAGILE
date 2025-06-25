@@ -2,6 +2,7 @@ package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClienteDTO;
+import com.academiabaile.backend.entidades.CeldaHorarioDTO;
 import com.academiabaile.backend.entidades.Clase;
 import com.academiabaile.backend.entidades.Nivel;
 import com.academiabaile.backend.entidades.Horario;
@@ -11,7 +12,6 @@ import com.academiabaile.backend.repository.ClaseRepository;
 import com.academiabaile.backend.repository.NivelRepository;
 import com.academiabaile.backend.repository.HorarioRepository;
 import com.academiabaile.backend.service.AlumnoService;
-import com.academiabaile.backend.service.AuditoriaService;
 import com.academiabaile.backend.service.ClaseNivelService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +147,10 @@ public List<Clase> obtenerClasesConNivelesAbiertos() {
     public ResponseEntity<List<ClienteDTO>> listarAlumnosInscritos(@PathVariable Integer id) {
         return ResponseEntity.ok(alumnoService.listarAlumnosPorClaseNivel(id));
     }
+    @GetMapping("/horario-disponibilidad")
+    public ResponseEntity<List<CeldaHorarioDTO>> obtenerHorario() {
+    return ResponseEntity.ok(claseNivelService.obtenerMapaHorarioDisponible());
+}
 
 
 }

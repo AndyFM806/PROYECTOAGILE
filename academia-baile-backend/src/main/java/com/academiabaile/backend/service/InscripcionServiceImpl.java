@@ -10,6 +10,7 @@ import com.academiabaile.backend.entidades.InscripcionDTO;
 import com.academiabaile.backend.entidades.MovimientoClienteDTO;
 import com.academiabaile.backend.entidades.NotaCredito;
 import com.academiabaile.backend.entidades.Cliente;
+import com.academiabaile.backend.entidades.Horario;
 import com.academiabaile.backend.entidades.Inscripcion;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.repository.ClienteRepository;
@@ -47,49 +48,52 @@ public Integer registrar(InscripcionDTO dto) {
         throw new RuntimeException("Clase llena");
     }
 
-    // Obtener o crear cliente
-    // Buscar si el cliente ya existe por DNI
-        Optional<Cliente> clienteOpt = clienteRepository.findByDni(dto.getDni());
-        Cliente cliente;
+    // Obtener o crear cliente por DNI
+    Optional<Cliente> clienteOpt = clienteRepository.findByDni(dto.getDni());
+    Cliente cliente;
 
-        if (clienteOpt.isPresent()) {
-            cliente = clienteOpt.get();
+    if (clienteOpt.isPresent()) {
+        cliente = clienteOpt.get();
 
-            // Verificar si ya está inscrito con estado APROBADA
-            boolean yaInscrito = inscripcionRepository.existsByClienteAndClaseNivelAndEstado(
-                cliente, claseNivel, "aprobada"
-            );
+        // 🔒 Verificar conflicto de horario con inscripción aprobada
+        boolean conflictoHorario = inscripcionRepository
+            .existsByClienteIdAndClaseNivel_HorarioIdAndEstado(cliente.getId(), claseNivel.getHorario().getId(), "aprobada");
 
-            if (yaInscrito) {
-                throw new RuntimeException("El cliente ya tiene una inscripción aprobada en esta clase.");
-            }
-
-        } else {
-            // Si no existe, crearlo normalmente
-            cliente = new Cliente();
-            cliente.setDni(dto.getDni());
-            cliente.setNombres(dto.getNombres());
-            cliente.setApellidos(dto.getApellidos());
-            cliente.setCorreo(dto.getCorreo());
-            cliente.setDireccion(dto.getDireccion()); // si lo manejas
-            cliente = clienteRepository.save(cliente);
+        if (conflictoHorario) {
+            throw new RuntimeException("El cliente ya está inscrito en una clase con este mismo horario.");
         }
 
+        // 🔒 Verificar duplicidad exacta en clase y nivel
+        boolean yaInscrito = inscripcionRepository.existsByClienteAndClaseNivelAndEstado(
+            cliente, claseNivel, "aprobada"
+        );
+        if (yaInscrito) {
+            throw new RuntimeException("El cliente ya tiene una inscripción aprobada en esta clase.");
+        }
 
-    // Crear nueva inscripción
+    } else {
+        // Crear cliente nuevo
+        cliente = new Cliente();
+        cliente.setDni(dto.getDni());
+        cliente.setNombres(dto.getNombres());
+        cliente.setApellidos(dto.getApellidos());
+        cliente.setCorreo(dto.getCorreo());
+        cliente.setDireccion(dto.getDireccion());
+        cliente = clienteRepository.save(cliente);
+    }
+
+    // Crear inscripción
     Inscripcion inscripcion = new Inscripcion();
     inscripcion.setCliente(cliente);
     inscripcion.setClaseNivel(claseNivel);
     inscripcion.setFechaInscripcion(LocalDate.now().atStartOfDay());
 
-    // Lógica con nota de crédito
+    // Nota de crédito
     if (dto.getCodigoNotaCredito() != null && !dto.getCodigoNotaCredito().isEmpty()) {
         NotaCredito nota = notaCreditoService.validarNota(dto.getCodigoNotaCredito());
-
         double precioClase = claseNivel.getPrecio();
 
         if (nota.getValor() >= precioClase) {
-            // Nota cubre todo el precio
             notaCreditoService.marcarComoUsada(nota);
             inscripcion.setEstado("aprobada");
             inscripcion.setNotaCredito(nota);
@@ -100,21 +104,19 @@ public Integer registrar(InscripcionDTO dto) {
                 " fue completada usando el código: " + nota.getCodigo() +
                 ". No necesitas realizar ningún pago adicional.");
         } else {
-            // Nota cubre parcialmente
             double diferencia = precioClase - nota.getValor();
             inscripcion.setEstado("pendiente_pago_diferencia");
             inscripcion.setMontoPendiente(diferencia);
             inscripcion.setNotaCredito(nota);
         }
     } else {
-        // Sin nota de crédito → pago completo pendiente
         inscripcion.setEstado("pendiente");
     }
-
 
     inscripcionRepository.save(inscripcion);
     return inscripcion.getId();
 }
+
 
     @Override
     public void completarPagoDiferencia(Integer inscripcionId, String metodo, String comprobanteUrl) {

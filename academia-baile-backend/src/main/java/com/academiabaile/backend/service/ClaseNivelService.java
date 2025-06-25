@@ -1,5 +1,6 @@
 package com.academiabaile.backend.service;
 
+import com.academiabaile.backend.entidades.CeldaHorarioDTO;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClaseNivelDTO;
 import com.academiabaile.backend.entidades.CrearClaseNivelDTO;
@@ -13,5 +14,5 @@ public interface ClaseNivelService {
         ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto);
         public void reabrirClaseNivel(Integer id);
         List<ClaseNivel> findByClaseIdAndEstado(Integer claseId, String estado);
-        
+        public List<CeldaHorarioDTO> obtenerMapaHorarioDisponible();
 }
