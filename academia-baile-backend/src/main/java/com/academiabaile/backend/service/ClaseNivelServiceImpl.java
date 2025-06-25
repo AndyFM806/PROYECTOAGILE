@@ -5,6 +5,8 @@ import com.academiabaile.backend.entidades.CeldaHorarioDTO;
 import com.academiabaile.backend.entidades.Clase;
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClaseNivelDTO;
+import com.academiabaile.backend.entidades.ClaseNivelHorario;
+import com.academiabaile.backend.entidades.ClaseNivelHorarioId;
 import com.academiabaile.backend.entidades.CrearClaseNivelDTO;
 import com.academiabaile.backend.entidades.Horario;
 import com.academiabaile.backend.entidades.Inscripcion;
@@ -17,12 +19,15 @@ import com.academiabaile.backend.repository.InscripcionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import com.academiabaile.backend.repository.ClaseRepository;
 import com.academiabaile.backend.repository.NivelRepository;
+
+import jakarta.transaction.Transactional;
 
 import com.academiabaile.backend.repository.HorarioRepository;
 
@@ -47,24 +52,29 @@ public class ClaseNivelServiceImpl implements ClaseNivelService {
 
 
     @Override
-    public List<ClaseNivelDTO> obtenerNivelesPorClase(Integer claseId) {
-        
-    List<ClaseNivel> lista = claseNivelRepository.findByClaseId(claseId);
-    for (ClaseNivel cn : lista) {
-        System.out.println("Nivel: " + (cn.getNivel() != null ? cn.getNivel().getNombre() : "null"));
-        System.out.println("Horario: " + (cn.getHorario() != null ? cn.getHorario().getDias() : "null"));
-    }
-    
-    return lista.stream().map(cn -> new ClaseNivelDTO(
-    cn.getNivel().getNombre(),
-    cn.getHorario().getDias(),
-    cn.getHorario().getHora(),
-    cn.getPrecio(),
-    cn.getAforo() // 👈 NUEVO CAMPO
-)).collect(Collectors.toList());
+public List<ClaseNivelDTO> obtenerNivelesPorClase(Integer claseId) {
+    List<ClaseNivel> claseNiveles = claseNivelRepository.findByClaseId(claseId);
+    List<ClaseNivelDTO> resultado = new ArrayList<>();
 
-    
+    for (ClaseNivel cn : claseNiveles) {
+        List<ClaseNivelHorario> horarios = claseNivelHorarioRepository.findByClaseNivelId(cn.getId());
+
+        for (ClaseNivelHorario cnh : horarios) {
+            Horario horario = cnh.getHorario();
+
+            resultado.add(new ClaseNivelDTO(
+                cn.getNivel().getNombre(),
+                horario.getDias(),
+                horario.getHora(),
+                cn.getPrecio(),
+                cn.getAforo()
+            ));
+        }
     }
+
+    return resultado;
+}
+
      @Autowired
     private InscripcionRepository inscripcionRepository;
 
@@ -103,55 +113,56 @@ public void cerrarClaseSiNoLlegaAlMinimo(ClaseNivel claseNivel) {
         }
     }
 }
+@Autowired
+private com.academiabaile.backend.repository.ClaseNivelHorarioRepository claseNivelHorarioRepository;
 @Override
+@Transactional
 public ClaseNivel crearClaseNivel(CrearClaseNivelDTO dto) {
     Clase clase = claseRepository.findById(dto.getClaseId())
         .orElseThrow(() -> new RuntimeException("Clase no encontrada"));
+
     Nivel nivel = nivelRepository.findById(dto.getNivelId())
         .orElseThrow(() -> new RuntimeException("Nivel no encontrado"));
-    Horario horario = horarioRepository.findById(dto.getHorarioId())
-        .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
-    // 🔍 VALIDACIÓN 1: No más de 3 clases por día+hora
-    int conteo = claseNivelRepository.countByHorarioId(horario.getId());
-    if (conteo >= 3) {
-        throw new RuntimeException("Ya existen 3 clases en este horario. No se puede asignar más.");
+    Aula aula = aulaRepository.findById(dto.getAulaId())
+        .orElseThrow(() -> new RuntimeException("Aula no encontrada"));
+
+    // Validación: no más de 3 clases por cada horario + aula
+    for (Integer horarioId : dto.getHorariosIds()) {
+        int count = claseNivelHorarioRepository.countByHorarioIdAndClaseNivel_Aula_Id(horarioId, aula.getId());
+        if (count >= 3) {
+            throw new RuntimeException("Ya hay 3 clases en este horario y aula");
+        }
     }
 
-    // 🔍 VALIDACIÓN 2: Aula no debe estar ocupada en ese horario
-    boolean aulaOcupada = claseNivelRepository.existsByHorarioIdAndAulaId(
-        horario.getId(), dto.getAulaId());
-    if (aulaOcupada) {
-        throw new RuntimeException("El aula ya está ocupada en ese horario.");
-    }
-
-    // 🔍 VALIDACIÓN 3: Fecha de cierre no vencida
-    if (dto.getFechaCierre() != null && dto.getFechaCierre().isBefore(java.time.LocalDate.now())) {
-        throw new RuntimeException("La fecha de cierre ya pasó. No se puede crear esta clase.");
-    }
-
-    // 🧱 Crear la clase normalmente
+    // Crear clase nivel
     ClaseNivel claseNivel = new ClaseNivel();
     claseNivel.setClase(clase);
     claseNivel.setNivel(nivel);
-    claseNivel.setHorario(horario);
+    claseNivel.setAula(aula);
     claseNivel.setPrecio(dto.getPrecio());
     claseNivel.setAforo(dto.getAforo());
     claseNivel.setEstado("abierta");
-
-    // ✅ Setear aula
-    Aula aula = new Aula();
-    aula.setId(dto.getAulaId());
-    claseNivel.setAula(aula);
-
-    // ✅ Setear fecha de cierre si aplica
-    if (dto.getFechaCierre() != null) {
-        claseNivel.setFechaCierre(dto.getFechaCierre());
-    }
+    claseNivel.setFechaCierre(dto.getFechaCierre());
 
     claseNivelRepository.save(claseNivel);
+
+    // Relacionar con horarios
+    for (Integer horarioId : dto.getHorariosIds()) {
+        Horario horario = horarioRepository.findById(horarioId)
+            .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+
+        ClaseNivelHorario cnHorario = new ClaseNivelHorario();
+        cnHorario.setId(new ClaseNivelHorarioId(claseNivel.getId(), horario.getId()));
+        cnHorario.setClaseNivel(claseNivel);
+        cnHorario.setHorario(horario);
+        claseNivelHorarioRepository.save(cnHorario);
+    }
+
     return claseNivel;
 }
+
+
 
 
     @Override
@@ -217,9 +228,11 @@ public List<CeldaHorarioDTO> obtenerMapaHorarioDisponible() {
 
     for (Horario horario : horarios) {
         for (Aula aula : aulas) {
+            // Buscar si existe una clase nivel con ese horario y aula
             Optional<ClaseNivel> ocupado = clases.stream()
-                .filter(cn -> cn.getHorario().getId().equals(horario.getId())
-                        && cn.getAula().getId().equals(aula.getId()))
+                .filter(cn -> cn.getAula().getId().equals(aula.getId())
+                           && cn.getHorarios().stream()
+                               .anyMatch(h -> h.getId().equals(horario.getId())))
                 .findFirst();
 
             if (ocupado.isPresent()) {
@@ -231,8 +244,8 @@ public List<CeldaHorarioDTO> obtenerMapaHorarioDisponible() {
                     true,
                     cn.getClase().getNombre() + " - " + cn.getNivel().getNombre(),
                     cn.getEstado(),
-                    horario.getId(), // nuevo
-                    aula.getId()     // nuevo
+                    horario.getId(),
+                    aula.getId()
                 ));
             } else {
                 resultado.add(new CeldaHorarioDTO(
@@ -242,8 +255,8 @@ public List<CeldaHorarioDTO> obtenerMapaHorarioDisponible() {
                     false,
                     null,
                     null,
-                    horario.getId(), // nuevo
-                    aula.getId()     // nuevo
+                    horario.getId(),
+                    aula.getId()
                 ));
             }
         }

@@ -2,6 +2,7 @@ package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.ClienteDTO;
+import com.academiabaile.backend.entidades.Aula;
 import com.academiabaile.backend.entidades.CeldaHorarioDTO;
 import com.academiabaile.backend.entidades.Clase;
 import com.academiabaile.backend.entidades.Nivel;
@@ -58,28 +59,40 @@ public class ClaseNivelController {
     }
 
     // Crear clase nivel usando el DTO
-    @PostMapping("/crear")
-    public ResponseEntity<?> crearClaseNivel(@RequestBody CrearClaseNivelDTO dto) {
-        try {
-            Clase clase = claseRepository.findById(dto.getClaseId()).orElseThrow(() -> new RuntimeException("Clase no encontrada"));
-            Nivel nivel = nivelRepository.findById(dto.getNivelId()).orElseThrow(() -> new RuntimeException("Nivel no encontrado"));
-            Horario horario = horarioRepository.findById(dto.getHorarioId()).orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+   @PostMapping("/crear")
+public ResponseEntity<?> crearClaseNivel(@RequestBody CrearClaseNivelDTO dto) {
+    try {
+        Clase clase = claseRepository.findById(dto.getClaseId())
+            .orElseThrow(() -> new RuntimeException("Clase no encontrada"));
+        Nivel nivel = nivelRepository.findById(dto.getNivelId())
+            .orElseThrow(() -> new RuntimeException("Nivel no encontrado"));
+        List<Horario> horarios = horarioRepository.findAllById(dto.getHorariosIds());
 
-            ClaseNivel nueva = new ClaseNivel();
-            nueva.setClase(clase);
-            nueva.setNivel(nivel);
-            nueva.setHorario(horario);
-            nueva.setPrecio(dto.getPrecio());
-            nueva.setAforo(dto.getAforo() != null ? dto.getAforo() : 20);
-            nueva.setEstado(dto.getEstado());
+        // 🛠️ SETEAR AULA
+        Aula aula = new Aula();
+        aula.setId(dto.getAulaId());
 
-            ClaseNivel guardada = claseNivelRepository.save(nueva);
+        ClaseNivel nueva = new ClaseNivel();
+        nueva.setClase(clase);
+        nueva.setNivel(nivel);
+        nueva.setAula(aula); // 🔥 Aquí estaba el problema
+        nueva.setPrecio(dto.getPrecio());
+        nueva.setAforo(dto.getAforo());
+        nueva.setEstado(dto.getEstado());
+        nueva.setFechaCierre(dto.getFechaCierre());
 
-            return ResponseEntity.ok(guardada);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al crear ClaseNivel: " + e.getMessage());
+        ClaseNivel guardada = claseNivelRepository.save(nueva);
+
+        for (Horario h : horarios) {
+            claseNivelRepository.insertIntoClaseNivelHorario(guardada.getId(), h.getId());
         }
+
+        return ResponseEntity.ok(guardada);
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body("Error al crear ClaseNivel: " + e.getMessage());
     }
+}
+
 
     // Editar clase nivel
     @PutMapping("/{id}")
@@ -90,17 +103,20 @@ public class ClaseNivelController {
 
             Clase clase = claseRepository.findById(dto.getClaseId()).orElseThrow(() -> new RuntimeException("Clase no encontrada"));
             Nivel nivel = nivelRepository.findById(dto.getNivelId()).orElseThrow(() -> new RuntimeException("Nivel no encontrado"));
-            Horario horario = horarioRepository.findById(dto.getHorarioId()).orElseThrow(() -> new RuntimeException("Horario no encontrado"));
-
+            List<Horario> horarios = horarioRepository.findAllById(dto.getHorariosIds());
+                    Aula aula = new Aula();
+                    aula.setId(dto.getAulaId());
             existente.setClase(clase);
             existente.setNivel(nivel);
-            existente.setHorario(horario);
             existente.setPrecio(dto.getPrecio());
             existente.setAforo(dto.getAforo());
             existente.setEstado(dto.getEstado());
             existente.setFechaCierre(dto.getFechaCierre());
 
             ClaseNivel actualizada = claseNivelRepository.save(existente);
+            for (Horario h : horarios) {
+            claseNivelRepository.insertIntoClaseNivelHorario(existente.getId(), h.getId());
+        }
 
             return ResponseEntity.ok(actualizada);
         } catch (Exception e) {

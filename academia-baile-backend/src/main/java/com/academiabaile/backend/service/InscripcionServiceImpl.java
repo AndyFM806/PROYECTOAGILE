@@ -1,5 +1,6 @@
 package com.academiabaile.backend.service;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +57,15 @@ public Integer registrar(InscripcionDTO dto) {
         cliente = clienteOpt.get();
 
         // 🔒 Verificar conflicto de horario con inscripción aprobada
+        List<Integer> horariosClaseNivel = claseNivelRepository.obtenerHorariosPorClaseNivel(claseNivel.getId());
+
         boolean conflictoHorario = inscripcionRepository
-            .existsByClienteIdAndClaseNivel_HorarioIdAndEstado(cliente.getId(), claseNivel.getHorario().getId(), "aprobada");
+            .existeConflictoHorarios(cliente.getId(), horariosClaseNivel, "aprobada");
 
         if (conflictoHorario) {
-            throw new RuntimeException("El cliente ya está inscrito en una clase con este mismo horario.");
+            throw new RuntimeException("El cliente ya está inscrito en una clase con alguno de estos horarios.");
         }
+
 
         // 🔒 Verificar duplicidad exacta en clase y nivel
         boolean yaInscrito = inscripcionRepository.existsByClienteAndClaseNivelAndEstado(

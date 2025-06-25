@@ -10,7 +10,6 @@ public class Horario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_horario") // 👈 Esto enlaza con la columna real de la tabla
     private Integer id;
 
     private String dias;

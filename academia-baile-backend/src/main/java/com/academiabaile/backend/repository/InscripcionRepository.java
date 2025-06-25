@@ -3,6 +3,8 @@ package com.academiabaile.backend.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.Cliente;
@@ -14,7 +16,6 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     boolean existsByClienteAndClaseNivel(Cliente cliente, ClaseNivel claseNivel);
     List<Inscripcion> findByClaseNivel_IdInAndEstado(List<Integer> claseNivelIds, String estado);
     List<Inscripcion> findByClaseNivelIn(List<ClaseNivel> niveles);
-    List<Inscripcion> findByClaseNivel(ClaseNivel claseNivel);
     List<Inscripcion> findByEstadoAndNotaCreditoIsNotNullAndMontoPendienteGreaterThan(String estado, Double montoMinimo);
     Inscripcion findByClienteAndClaseNivel(Cliente cliente, ClaseNivel claseNivel);
     List<Inscripcion> findByClaseNivelAndEstado(ClaseNivel claseNivel, String estado);
@@ -22,7 +23,9 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     boolean existsByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
     java.util.Optional<Inscripcion> findByClienteIdAndClaseNivelId(Integer clienteId, Integer claseNivelId);
     boolean existsByClienteAndClaseNivelAndEstado(Cliente cliente, ClaseNivel claseNivel,String estado);
-boolean existsByClienteIdAndClaseNivel_HorarioIdAndEstado(Long clienteId, Integer horarioId, String estado);
     List<Inscripcion> findByClaseNivelId(Integer claseNivelId);
-    
+    @Query("SELECT COUNT(i) > 0 FROM Inscripcion i WHERE i.cliente.id = :clienteId AND i.estado = :estado AND i.claseNivel.id IN (" +
+       "SELECT cn.id FROM ClaseNivel cn JOIN cn.horarios h WHERE h.id IN :horarioIds)")
+    boolean existeConflictoHorarios(@Param("clienteId") Long clienteId, @Param("horarioIds") List<Integer> horarioIds, @Param("estado") String estado);
+
 }

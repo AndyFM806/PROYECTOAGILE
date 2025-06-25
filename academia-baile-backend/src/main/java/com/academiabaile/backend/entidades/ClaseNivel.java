@@ -1,6 +1,7 @@
 package com.academiabaile.backend.entidades;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,9 +24,14 @@ public class ClaseNivel {
     @JoinColumn(name = "nivel_id")
     private Nivel nivel;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "horario_id")
-    private Horario horario;
+    @ManyToMany
+    @JoinTable(
+    name = "clase_nivel_horario",
+    joinColumns = @JoinColumn(name = "clase_nivel_id"),
+    inverseJoinColumns = @JoinColumn(name = "horario_id")
+    )
+    private List<Horario> horarios;
+
 
     @Column(nullable = false)
     private int aforo;
