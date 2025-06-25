@@ -19,11 +19,9 @@ import com.academiabaile.backend.repository.InscripcionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import com.academiabaile.backend.repository.ClaseRepository;
 import com.academiabaile.backend.repository.NivelRepository;
 
@@ -67,7 +65,9 @@ public List<ClaseNivelDTO> obtenerNivelesPorClase(Integer claseId) {
                 horario.getDias(),
                 horario.getHora(),
                 cn.getPrecio(),
-                cn.getAforo()
+                cn.getAforo(),
+                cn.getFechaInicio(),
+                cn.getFechaFin()
             ));
         }
     }

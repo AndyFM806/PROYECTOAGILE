@@ -1,5 +1,7 @@
 package com.academiabaile.backend.entidades;
 
+import java.time.LocalDate;
+
 public class ClaseNivelDTO {
     private String nivel;
     private String dias;
@@ -7,20 +9,24 @@ public class ClaseNivelDTO {
     private Double precio;
     private int aforo;
     private String estado;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
 
     // Constructor con estado
-    public ClaseNivelDTO(String nivel, String dias, String hora, Double precio, int aforo, String estado) {
+    public ClaseNivelDTO(String nivel, String dias, String hora, Double precio, int aforo, String estado, LocalDate fechaInicio, LocalDate fechaFin) {
         this.nivel = nivel;
         this.dias = dias;
         this.hora = hora;
         this.precio = precio;
         this.aforo = aforo;
         this.estado = estado;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
     }
 
     // Constructor sin estado (opcional, si aún se necesita por compatibilidad)
-    public ClaseNivelDTO(String nivel, String dias, String hora, Double precio, int aforo) {
-        this(nivel, dias, hora, precio, aforo, null);
+    public ClaseNivelDTO(String nivel, String dias, String hora, Double precio, int aforo, LocalDate fechaInicio, LocalDate fechaFin) {
+        this(nivel, dias, hora, precio, aforo, null, fechaInicio, fechaFin);
     }
 
 
@@ -71,5 +77,20 @@ public class ClaseNivelDTO {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public LocalDate getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
     }
 }
