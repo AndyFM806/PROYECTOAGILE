@@ -201,5 +201,10 @@ public ResponseEntity<?> moverCliente(@RequestBody MovimientoClienteDTO dto) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
+    @GetMapping("/aprobadas")
+public ResponseEntity<List<Inscripcion>> obtenerInscripcionesAprobadas() {
+    List<Inscripcion> aprobadas = inscripcionRepository.findByEstadoIgnoreCase("aprobada");
+    return ResponseEntity.ok(aprobadas);
+}
 
 }

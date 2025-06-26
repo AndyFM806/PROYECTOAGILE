@@ -34,6 +34,6 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     List<Inscripcion> findByFechaEntre(@Param("desde") LocalDateTime desdeFecha, @Param("hasta") LocalDateTime hastaFecha);
 
     long countByClaseNivelId(Integer claseNivelId);
-
+    List<Inscripcion> findByEstadoIgnoreCase(String estado);
 
 }
