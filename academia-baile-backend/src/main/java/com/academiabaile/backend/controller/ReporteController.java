@@ -4,6 +4,8 @@ import com.academiabaile.backend.entidades.ClaseNivel;
 import com.academiabaile.backend.entidades.Inscripcion;
 import com.academiabaile.backend.repository.ClaseNivelRepository;
 import com.academiabaile.backend.repository.InscripcionRepository;
+import java.time.format.DateTimeFormatter;
+
 
 import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.kernel.geom.PageSize;
@@ -67,6 +69,7 @@ public class ReporteController {
             for (String h : headers) {
                 tablaInscritos.addHeaderCell(new Cell().add(new Paragraph(h).setBold()));
             }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
             for (Inscripcion i : inscripciones) {
                 tablaInscritos.addCell(i.getCliente().getNombres() + " " + i.getCliente().getApellidos());
@@ -74,8 +77,9 @@ public class ReporteController {
                 tablaInscritos.addCell(i.getClaseNivel().getClase().getNombre());
                 tablaInscritos.addCell(i.getClaseNivel().getNivel().getNombre());
                 tablaInscritos.addCell(i.getEstado());
-                tablaInscritos.addCell(String.valueOf(i.getFechaInscripcion()));
+                tablaInscritos.addCell(i.getFechaInscripcion().toLocalDate().format(formatter));
             }
+            
             document.add(tablaInscritos);
             document.add(new Paragraph("\n"));
 
