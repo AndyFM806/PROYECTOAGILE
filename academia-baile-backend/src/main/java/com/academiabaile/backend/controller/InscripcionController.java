@@ -21,7 +21,24 @@ public class InscripcionController {
     @Autowired private AlmacenamientoService almacenamientoService;
     @Autowired private MercadoPagoRestService mpService;
     @Autowired private EmailService emailService;
+    
+    @PostMapping("/{id}/enviar-bienvenida")
+    public ResponseEntity<?> enviarCorreoBienvenida(@PathVariable Integer id) {
+        Inscripcion insc = inscripcionRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
 
+        emailService.enviarCorreo(
+            insc.getCliente().getCorreo(),
+            "¡Inscripción aprobada y bienvenida!",
+            String.format("Hola %s,\n\n¡Tu inscripción ha sido aprobada! Bienvenido/a a nuestra academia. Te esperamos en la clase '%s - %s'.",
+                insc.getCliente().getNombres(),
+                insc.getClaseNivel().getClase().getNombre(),
+                insc.getClaseNivel().getNivel().getNombre()
+            )
+        );
+
+        return ResponseEntity.ok("Correo de bienvenida enviado");
+    }
     // 1. Registrar inscripción
     @PostMapping
     public ResponseEntity<?> registrar(@RequestBody InscripcionDTO dto) {
