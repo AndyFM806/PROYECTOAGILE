@@ -14,5 +14,5 @@ public class CeldaHorarioDTO {
     private String estado; // abierta, cerrada, cancelada, etc.
     private Integer horarioId;
     private Integer aulaId;
-
+    private Integer claseNivelId;
 }

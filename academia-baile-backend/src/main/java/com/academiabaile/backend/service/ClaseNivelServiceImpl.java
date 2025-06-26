@@ -245,7 +245,8 @@ public List<CeldaHorarioDTO> obtenerMapaHorarioDisponible() {
                     cn.getClase().getNombre() + " - " + cn.getNivel().getNombre(),
                     cn.getEstado(),
                     horario.getId(),
-                    aula.getId()
+                    aula.getId(),
+                    cn.getId() // Incluye el claseNivelId
                 ));
             } else {
                 resultado.add(new CeldaHorarioDTO(
@@ -256,7 +257,8 @@ public List<CeldaHorarioDTO> obtenerMapaHorarioDisponible() {
                     null,
                     null,
                     horario.getId(),
-                    aula.getId()
+                    aula.getId(),
+                    null // No hay claseNivelId
                 ));
             }
         }
