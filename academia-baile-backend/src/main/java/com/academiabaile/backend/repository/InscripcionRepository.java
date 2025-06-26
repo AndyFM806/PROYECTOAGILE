@@ -30,7 +30,7 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
        "SELECT cn.id FROM ClaseNivel cn JOIN cn.horarios h WHERE h.id IN :horarioIds)")
     boolean existeConflictoHorarios(@Param("clienteId") Long clienteId, @Param("horarioIds") List<Integer> horarioIds, @Param("estado") String estado);
     // En InscripcionRepository
-    @Query("SELECT i FROM Inscripcion i WHERE (:desde IS NULL OR i.fechaRegistro >= :desde) AND (:hasta IS NULL OR i.fechaRegistro <= :hasta)")
+    @Query("SELECT i FROM Inscripcion i WHERE (:desde IS NULL OR i.fecha_Inscripcion >= :desde) AND (:hasta IS NULL OR i.fecha_Inscripcion <= :hasta)")
     List<Inscripcion> findByFechaEntre(@Param("desde") LocalDateTime desdeFecha, @Param("hasta") LocalDateTime hastaFecha);
 
     long countByClaseNivelId(Integer claseNivelId);
