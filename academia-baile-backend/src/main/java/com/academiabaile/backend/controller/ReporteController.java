@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:5500", "https://timbatumbao-front.onrender.com"})
 @RequestMapping("/api/reportes")
 public class ReporteController {
 
