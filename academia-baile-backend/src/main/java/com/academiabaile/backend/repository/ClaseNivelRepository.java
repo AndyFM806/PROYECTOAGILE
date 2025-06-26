@@ -31,6 +31,10 @@ void eliminarHorariosDeClaseNivel(@Param("claseNivelId") Integer claseNivelId);
     @Query(value = "SELECT horario_id FROM clase_nivel_horario WHERE clase_nivel_id = :claseNivelId", nativeQuery = true)
     List<Integer> obtenerHorariosPorClaseNivel(@Param("claseNivelId") Integer claseNivelId);
 
+    // En ClaseNivelRepository
+    @Query("SELECT c FROM ClaseNivel c WHERE (:desde IS NULL OR c.fechaInicio >= :desde) AND (:hasta IS NULL OR c.fechaInicio <= :hasta)")
+    List<ClaseNivel> findByFechaEntre(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
 
 }
 

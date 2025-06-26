@@ -1,5 +1,7 @@
 package com.academiabaile.backend.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,5 +29,11 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Intege
     @Query("SELECT COUNT(i) > 0 FROM Inscripcion i WHERE i.cliente.id = :clienteId AND i.estado = :estado AND i.claseNivel.id IN (" +
        "SELECT cn.id FROM ClaseNivel cn JOIN cn.horarios h WHERE h.id IN :horarioIds)")
     boolean existeConflictoHorarios(@Param("clienteId") Long clienteId, @Param("horarioIds") List<Integer> horarioIds, @Param("estado") String estado);
+    // En InscripcionRepository
+    @Query("SELECT i FROM Inscripcion i WHERE (:desde IS NULL OR i.fechaRegistro >= :desde) AND (:hasta IS NULL OR i.fechaRegistro <= :hasta)")
+    List<Inscripcion> findByFechaEntre(@Param("desde") LocalDateTime desdeFecha, @Param("hasta") LocalDateTime hastaFecha);
+
+    long countByClaseNivelId(Integer claseNivelId);
+
 
 }
