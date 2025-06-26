@@ -35,6 +35,11 @@ void eliminarHorariosDeClaseNivel(@Param("claseNivelId") Integer claseNivelId);
     @Query("SELECT c FROM ClaseNivel c WHERE (:desde IS NULL OR c.fechaInicio >= :desde) AND (:hasta IS NULL OR c.fechaInicio <= :hasta)")
     List<ClaseNivel> findByFechaEntre(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
 
+    @Modifying
+    @Transactional
+@Query(value = "DELETE FROM clase_nivel_horario WHERE clase_nivel_id = :claseNivelId", nativeQuery = true)
+void deleteHorariosByClaseNivelId(@Param("claseNivelId") Integer claseNivelId);
+
 
 }
 

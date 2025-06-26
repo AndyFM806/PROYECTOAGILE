@@ -53,7 +53,8 @@ public class ClaseNivel {
 
         @Column(name = "fecha_fin")
         private LocalDate fechaFin;
-
+    @Column(name = "distintivo")
+    private String distintivo;
     }
 
 
