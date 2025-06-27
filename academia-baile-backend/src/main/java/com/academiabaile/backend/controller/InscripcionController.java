@@ -206,5 +206,10 @@ public ResponseEntity<List<Inscripcion>> obtenerInscripcionesAprobadas() {
     List<Inscripcion> aprobadas = inscripcionRepository.findByEstadoIgnoreCase("aprobada");
     return ResponseEntity.ok(aprobadas);
 }
+    @GetMapping("/{id}/saldo")
+    public ResponseEntity<SaldoInscripcionDTO> obtenerSaldo(@PathVariable Integer id) {
+        SaldoInscripcionDTO dto = inscripcionService.calcularSaldo(id);
+        return ResponseEntity.ok(dto);
+    }
 
 }

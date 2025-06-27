@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.academiabaile.backend.entidades.InscripcionDTO;
 import com.academiabaile.backend.entidades.MovimientoClienteDTO;
 import com.academiabaile.backend.entidades.NotaCredito;
+import com.academiabaile.backend.entidades.SaldoInscripcionDTO;
 import com.academiabaile.backend.entidades.Cliente;
 import com.academiabaile.backend.entidades.Horario;
 import com.academiabaile.backend.entidades.Inscripcion;
@@ -246,4 +247,15 @@ public void moverCliente(MovimientoClienteDTO dto) {
 
 
 }
+@Override
+public SaldoInscripcionDTO calcularSaldo(Integer inscripcionId) {
+    Inscripcion inscripcion = inscripcionRepository.findById(inscripcionId)
+        .orElseThrow(() -> new RuntimeException("Inscripción no encontrada"));
+
+    double total = inscripcion.getClaseNivel().getPrecio();
+    double valorNotaCredito = inscripcion.getNotaCredito() != null ? inscripcion.getNotaCredito().getValor() : 0.0;
+
+    return new SaldoInscripcionDTO(inscripcionId, total, valorNotaCredito);
+}
+
 }
