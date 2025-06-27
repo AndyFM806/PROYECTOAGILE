@@ -52,6 +52,8 @@ public NotaCredito validarNota(String codigo) {
 
     return nota;
 }
+@Autowired
+private EmailService emailService;
     @Override
     public NotaCredito crearNotaCreditoNueva(Cliente cliente, Double valor, LocalDate fechaEmision, LocalDate fechaExpiracion, ClaseNivel claseCancelada) {
     NotaCredito nota = new NotaCredito();
@@ -61,7 +63,17 @@ public NotaCredito validarNota(String codigo) {
     nota.setFechaExpiracion(fechaExpiracion);
     nota.setCodigo(UUID.randomUUID().toString().substring(0, 10));
     nota.setClaseCancelada(claseCancelada); // ✅ ¡Esto es lo que faltaba!
-
+        emailService.enviarCorreo(
+            cliente.getCorreo(),
+            "Nueva Nota de Crédito - Academia de Baile",
+            String.format("Hola %s,\n\nSe ha generado una nueva nota de crédito por un valor de %.2f. " +
+                            "Puedes usarla para futuras inscripciones.\n\nCódigo: %s\nFecha de emisión: %s\nFecha de expiración: %s",
+                    cliente.getNombres(),
+                    valor,
+                    nota.getCodigo(),
+                    fechaEmision,
+                    fechaExpiracion)
+        );
     return notaCreditoRepository.save(nota);
 }
 
