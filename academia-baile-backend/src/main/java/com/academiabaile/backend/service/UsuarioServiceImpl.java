@@ -42,7 +42,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         existente.setContrasena(passwordEncoder.encode(nuevo.getContrasena()));
         }
         existente.setRol(nuevo.getRol());
-        existente.setModulos(nuevo.getModulos());
+        existente.getModulos().clear(); // Limpia los módulos actuales
+        existente.getModulos().addAll(nuevo.getModulos()); // Agrega los nuevos
+
         return usuarioRepository.save(existente);
 
     }
