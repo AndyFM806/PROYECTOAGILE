@@ -1,6 +1,7 @@
 package com.academiabaile.backend.controller;
 
 import com.academiabaile.backend.entidades.ClaseNivel;
+import com.academiabaile.backend.entidades.Cliente;
 import com.academiabaile.backend.entidades.Inscripcion;
 import com.academiabaile.backend.repository.ClaseNivelRepository;
 import com.academiabaile.backend.repository.InscripcionRepository;
@@ -117,4 +118,45 @@ public class ReporteController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    @GetMapping("/alumnos-por-clase")
+public ResponseEntity<byte[]> generarPdfAlumnosPorClase(@RequestParam Integer id) {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+        PdfWriter writer = new PdfWriter(baos);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf);
+
+        List<Inscripcion> inscripciones = inscripcionRepository.findByClaseNivelId(id);
+
+        document.add(new Paragraph("📋 Alumnos por ClaseNivel").setBold().setFontSize(16));
+        document.add(new Paragraph("Total alumnos: " + inscripciones.size()));
+        document.add(new Paragraph("\n"));
+
+        Table tabla = new Table(UnitValue.createPercentArray(new float[]{4, 3, 3}))
+                        .useAllAvailableWidth();
+        tabla.addHeaderCell("Nombre");
+        tabla.addHeaderCell("DNI");
+        tabla.addHeaderCell("Correo");
+
+        for (Inscripcion insc : inscripciones) {
+            Cliente c = insc.getCliente();
+            tabla.addCell(c.getNombres() + " " + c.getApellidos());
+            tabla.addCell(c.getDni());
+            tabla.addCell(c.getCorreo() != null ? c.getCorreo() : "-");
+        }
+
+        document.add(tabla);
+        document.close();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.inline().filename("alumnos_por_clase.pdf").build());
+
+        return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+}
+
 }
