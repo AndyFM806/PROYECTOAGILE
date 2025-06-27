@@ -164,6 +164,7 @@ public void moverAlumnoDeClase(Integer clienteId, Integer origenClaseNivelId, In
         List<Inscripcion> inscripciones = inscripcionRepository.findByClaseNivelId(claseNivelId);
 
         return inscripciones.stream()
+                .filter(insc -> "aprobada".equalsIgnoreCase(insc.getEstado()))
                 .map(insc -> {
                     Cliente c = insc.getCliente();
                     ClienteDTO dto = new ClienteDTO();
