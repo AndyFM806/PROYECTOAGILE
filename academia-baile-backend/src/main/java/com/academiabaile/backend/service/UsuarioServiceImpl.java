@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+import com.academiabaile.backend.entidades.Rol;
 import com.academiabaile.backend.entidades.Usuario;
 
 import com.academiabaile.backend.repository.UsuarioRepository;
@@ -51,9 +51,19 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public void eliminarUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (usuario.getRol() == Rol.ADMIN) {
+            long adminCount = usuarioRepository.findAll().stream()
+                .filter(u -> u.getRol() == Rol.ADMIN)
+                .count();
+            if (adminCount <= 1) {
+                throw new RuntimeException("Eliminación no posible: debe haber al menos un usuario con rol ADMIN.");
+            }
+        }
 
         usuarioRepository.deleteById(id);
-
     }
 
     @Override
